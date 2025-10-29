@@ -618,7 +618,6 @@
         // Freeverb nodes
         let freeverbCombs = [];
         let freeverbAllpasses = [];
-        let freeverbDampingFilters = [];
 
         // Scales
         const scales = {
@@ -908,34 +907,33 @@
             delayMixB.connect(delayWetGain);
         }
 
-        // FREEVERB - Classic Schroeder reverb with 8 combs + 4 allpass
+        // FREEVERB - Classic Schroeder reverb with filtered-feedback combs + allpass
         function buildFreeverb() {
             if (!audioContext) return;
 
             // Clean up existing
             freeverbCombs.forEach(comb => {
                 comb.delay.disconnect();
+                comb.filter.disconnect();
+                comb.filterGain.disconnect();
+                comb.directGain.disconnect();
                 comb.feedback.disconnect();
-                comb.damping.disconnect();
-                comb.dampingGain.disconnect();
-                comb.gain.disconnect();
             });
             freeverbAllpasses.forEach(ap => {
                 ap.delay.disconnect();
                 ap.feedback.disconnect();
+                ap.feedforward.disconnect();
             });
             freeverbCombs = [];
             freeverbAllpasses = [];
-            freeverbDampingFilters = [];
 
             const roomSize = synthParams.reverbRoomSize;
             const damping = synthParams.reverbDamping;
 
-            // Freeverb tuning values (in samples at 44.1kHz, scaled for time)
+            // Freeverb tuning values (in samples at 44.1kHz, scaled to seconds)
             const sampleRate = audioContext.sampleRate;
-            const stereospread = 23 / sampleRate;
             
-            // Comb filter delay times (Freeverb standard values)
+            // Comb filter delay times (Freeverb standard tuning values)
             const combTunings = [
                 1116 / sampleRate,
                 1188 / sampleRate,
@@ -958,35 +956,57 @@
             const combMixer = audioContext.createGain();
             combMixer.gain.value = 0.125; // 1/8 for 8 combs
 
-            // Build 8 parallel comb filters
+            // Feedback calculation: muted(0.2) at roomSize=0, bright(0.84) at roomSize=1
+            const feedbackGain = 0.2 + (roomSize * 0.64);
+            
+            // Dampening: lower damping = darker sound (more filtering)
+            // Range from 500Hz (dark) to 10000Hz (bright)
+            const filterFreq = 500 + (damping * 9500);
+
+            // Build 8 parallel filtered-feedback comb filters
             combTunings.forEach(tuning => {
                 const delay = audioContext.createDelay(1.0);
-                delay.delayTime.value = tuning * (1 + roomSize);
+                delay.delayTime.value = tuning;
+                
+                // Lowpass filter in feedback loop (the "dampening")
+                const filter = audioContext.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = filterFreq;
+                filter.Q.value = 0.707; // Butterworth response
+                
+                const filterGain = audioContext.createGain();
+                filterGain.gain.value = damping;
+                
+                const directGain = audioContext.createGain();
+                directGain.gain.value = 1 - damping;
                 
                 const feedback = audioContext.createGain();
-                feedback.gain.value = 0.5 + (roomSize * 0.28); // Freeverb feedback calculation
+                feedback.gain.value = feedbackGain;
                 
-                // Damping lowpass filter
-                const dampingFilter = audioContext.createBiquadFilter();
-                dampingFilter.type = 'lowpass';
-                dampingFilter.frequency.value = 1000 + (1 - damping) * 10000;
-                dampingFilter.Q.value = 0.5;
-                
-                const dampingGain = audioContext.createGain();
-                dampingGain.gain.value = damping;
-                
-                const gain = audioContext.createGain();
-                gain.gain.value = 1;
+                const inputGain = audioContext.createGain();
+                inputGain.gain.value = 1;
 
-                // Comb topology with damping
-                delay.connect(dampingFilter);
-                dampingFilter.connect(dampingGain);
-                dampingGain.connect(feedback);
+                // Freeverb comb topology: 
+                // input -> delay -> [split: filter*damp + direct*(1-damp)] -> feedback*gain -> delay
+                delay.connect(filter);
+                delay.connect(directGain);
+                
+                filter.connect(filterGain);
+                
+                filterGain.connect(feedback);
+                directGain.connect(feedback);
+                
                 feedback.connect(delay);
-                delay.connect(gain);
-                gain.connect(combMixer);
+                delay.connect(combMixer);
 
-                freeverbCombs.push({ delay, feedback, damping: dampingFilter, dampingGain, gain });
+                freeverbCombs.push({ 
+                    delay, 
+                    filter, 
+                    filterGain, 
+                    directGain, 
+                    feedback,
+                    input: delay // For connecting input
+                });
             });
 
             // Build 4 serial allpass filters
@@ -1004,7 +1024,7 @@
                 const apMixer = audioContext.createGain();
                 apMixer.gain.value = 1;
 
-                // Allpass topology
+                // Freeverb allpass topology
                 apInput.connect(apDelay);
                 apInput.connect(apFeedforward);
                 apDelay.connect(apFeedback);
@@ -1012,7 +1032,7 @@
                 apDelay.connect(apMixer);
                 apFeedforward.connect(apMixer);
 
-                freeverbAllpasses.push({ delay: apDelay, feedback: apFeedback });
+                freeverbAllpasses.push({ delay: apDelay, feedback: apFeedback, feedforward: apFeedforward });
                 apInput = apMixer;
             });
 
@@ -1174,7 +1194,7 @@
             }
             
             if (freeverbCombs.length > 0) {
-                freeverbCombs.forEach(comb => vca.connect(comb.delay));
+                freeverbCombs.forEach(comb => vca.connect(comb.input));
             }
             
             osc1.start(now);
@@ -1725,14 +1745,28 @@
             // REVERB (Freeverb)
             const reverbRoomSizeKnob = new Knob(document.getElementById('reverbRoomSizeKnob'), 0, 100, 50, (v) => {
                 synthParams.reverbRoomSize = v / 100;
-                if (audioContext) buildFreeverb();
+                if (audioContext && freeverbCombs.length > 0) {
+                    // Update feedback gain for all combs
+                    const feedbackGain = 0.2 + (synthParams.reverbRoomSize * 0.64);
+                    freeverbCombs.forEach(comb => {
+                        comb.feedback.gain.value = feedbackGain;
+                    });
+                }
                 document.getElementById('reverbRoomSizeVal').textContent = Math.round(v) + '%';
             });
             document.getElementById('reverbRoomSizeKnob')._knobInstance = reverbRoomSizeKnob;
 
             const reverbDampingKnob = new Knob(document.getElementById('reverbDampingKnob'), 0, 100, 50, (v) => {
                 synthParams.reverbDamping = v / 100;
-                if (audioContext) buildFreeverb();
+                if (audioContext && freeverbCombs.length > 0) {
+                    // Update filter frequency and mix for all combs
+                    const filterFreq = 500 + (synthParams.reverbDamping * 9500);
+                    freeverbCombs.forEach(comb => {
+                        comb.filter.frequency.value = filterFreq;
+                        comb.filterGain.gain.value = synthParams.reverbDamping;
+                        comb.directGain.gain.value = 1 - synthParams.reverbDamping;
+                    });
+                }
                 document.getElementById('reverbDampingVal').textContent = Math.round(v) + '%';
             });
             document.getElementById('reverbDampingKnob')._knobInstance = reverbDampingKnob;
