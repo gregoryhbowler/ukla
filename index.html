@@ -17,6 +17,7 @@
             color: #e0e0e0;
             padding: 20px;
             min-height: 100vh;
+            touch-action: manipulation;
         }
 
         .container {
@@ -53,6 +54,7 @@
             gap: 30px;
             margin-bottom: 40px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -73,10 +75,23 @@
             border-color: #00d9ff;
         }
 
+        .btn:active {
+            transform: scale(0.95);
+        }
+
         .btn.active {
             background: #00d9ff;
             color: #0a0a0a;
             border-color: #00d9ff;
+        }
+
+        .btn.save-load {
+            color: #ffeb3b;
+            border-color: #444;
+        }
+
+        .btn.save-load:hover {
+            border-color: #ffeb3b;
         }
 
         .control-group {
@@ -141,6 +156,7 @@
             font-size: 0.7em;
             text-transform: uppercase;
             letter-spacing: 1px;
+            text-align: center;
         }
 
         .knob {
@@ -152,6 +168,7 @@
             position: relative;
             cursor: pointer;
             transition: border-color 0.2s;
+            touch-action: none;
         }
 
         .knob:hover {
@@ -173,6 +190,7 @@
             color: #00d9ff;
             font-size: 0.85em;
             font-weight: 500;
+            text-align: center;
         }
 
         .pulse-grid {
@@ -198,6 +216,7 @@
             position: relative;
             cursor: pointer;
             transition: all 0.2s;
+            touch-action: none;
         }
 
         .pulse-knob.active {
@@ -268,6 +287,10 @@
         input[type="text"]:focus {
             outline: none;
             border-color: #00d9ff;
+        }
+
+        input[type="file"] {
+            display: none;
         }
 
         .custom-scale {
@@ -348,6 +371,31 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+
+        @media (max-width: 768px) {
+            .main-controls {
+                gap: 15px;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.8em;
+            }
+
+            .knob {
+                width: 50px;
+                height: 50px;
+            }
+
+            .synth-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                gap: 15px;
+            }
+
+            .lane-controls {
+                grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+            }
+        }
     </style>
 </head>
 <body>
@@ -360,6 +408,9 @@
         <div class="main-controls">
             <button class="btn" id="startBtn">START</button>
             <button class="btn" id="stopBtn">STOP</button>
+            <button class="btn save-load" id="saveBtn">SAVE PRESET</button>
+            <button class="btn save-load" id="loadBtn">LOAD PRESET</button>
+            <input type="file" id="fileInput" accept=".json">
             <div class="tempo-knob-wrapper">
                 <div class="knob-container">
                     <span class="knob-label">TEMPO</span>
@@ -540,6 +591,12 @@
         let isPlaying = false;
         let currentStep = 0;
         let intervalId;
+        
+        // Delay character nodes
+        let delayWowLFO;
+        let delayWowGain;
+        let delaySaturation;
+        let delayFilter;
 
         // Scales
         const scales = {
@@ -588,13 +645,13 @@
             reverbType: 'spring'
         };
 
-        // Lane configuration
+        // Lane configuration - CHANGED: Start with 8 steps, 0 pulses (silent)
         const lanes = [
-            { steps: 16, pulses: 4, rotation: 0, octave: 4, randomness: 0, pattern: [], noteValues: [], transpose: 0 },
-            { steps: 12, pulses: 3, rotation: 0, octave: 5, randomness: 0, pattern: [], noteValues: [], transpose: 0 },
-            { steps: 8, pulses: 5, rotation: 0, octave: 3, randomness: 0, pattern: [], noteValues: [], transpose: 0 },
-            { steps: 16, pulses: 7, rotation: 0, octave: 4, randomness: 0, pattern: [], noteValues: [], transpose: 0 },
-            { steps: 10, pulses: 3, rotation: 0, octave: 5, randomness: 0, pattern: [], noteValues: [], transpose: 0 }
+            { steps: 8, pulses: 0, rotation: 0, octave: 4, randomness: 0, pattern: [], noteValues: [], transpose: 0 },
+            { steps: 8, pulses: 0, rotation: 0, octave: 5, randomness: 0, pattern: [], noteValues: [], transpose: 0 },
+            { steps: 8, pulses: 0, rotation: 0, octave: 3, randomness: 0, pattern: [], noteValues: [], transpose: 0 },
+            { steps: 8, pulses: 0, rotation: 0, octave: 4, randomness: 0, pattern: [], noteValues: [], transpose: 0 },
+            { steps: 8, pulses: 0, rotation: 0, octave: 5, randomness: 0, pattern: [], noteValues: [], transpose: 0 }
         ];
 
         // Synth control configurations
@@ -613,7 +670,7 @@
             { id: 'volume', label: 'VOLUME', min: 0, max: 100, value: 30, format: (v) => v + '%' }
         ];
 
-        // Knob interaction handler
+        // Knob interaction handler with MOBILE SUPPORT
         class Knob {
             constructor(element, min, max, value, onChange, step = null) {
                 this.element = element;
@@ -626,9 +683,15 @@
                 this.startY = 0;
                 this.startValue = 0;
 
+                // Mouse events
                 this.element.addEventListener('mousedown', this.onMouseDown.bind(this));
                 document.addEventListener('mousemove', this.onMouseMove.bind(this));
                 document.addEventListener('mouseup', this.onMouseUp.bind(this));
+
+                // Touch events for mobile
+                this.element.addEventListener('touchstart', this.onTouchStart.bind(this), { passive: false });
+                document.addEventListener('touchmove', this.onTouchMove.bind(this), { passive: false });
+                document.addEventListener('touchend', this.onTouchEnd.bind(this));
 
                 this.updateVisual();
             }
@@ -642,8 +705,32 @@
 
             onMouseMove(e) {
                 if (!this.isDragging) return;
+                this.handleDrag(e.clientY);
+            }
 
-                const delta = this.startY - e.clientY;
+            onMouseUp() {
+                this.isDragging = false;
+            }
+
+            onTouchStart(e) {
+                e.preventDefault();
+                this.isDragging = true;
+                this.startY = e.touches[0].clientY;
+                this.startValue = this.value;
+            }
+
+            onTouchMove(e) {
+                if (!this.isDragging) return;
+                e.preventDefault();
+                this.handleDrag(e.touches[0].clientY);
+            }
+
+            onTouchEnd() {
+                this.isDragging = false;
+            }
+
+            handleDrag(clientY) {
+                const delta = this.startY - clientY;
                 const range = this.max - this.min;
                 const sensitivity = range / 200;
                 
@@ -656,10 +743,6 @@
                 this.value = Math.max(this.min, Math.min(this.max, newValue));
                 this.updateVisual();
                 this.onChange(this.value);
-            }
-
-            onMouseUp() {
-                this.isDragging = false;
             }
 
             updateVisual() {
@@ -725,19 +808,30 @@
             return [...pattern.slice(rot), ...pattern.slice(0, rot)];
         }
 
-        // Create reverb buffer
+        // Create tape saturation waveshaper
+        function createTapeSaturation() {
+            const curve = new Float32Array(256);
+            for (let i = 0; i < 256; i++) {
+                const x = (i / 128) - 1;
+                // Soft tape-style saturation
+                curve[i] = Math.tanh(x * 1.5) * 0.85;
+            }
+            return curve;
+        }
+
+        // Create reverb buffer with IMPROVED CHARACTER
         function createReverbBuffer(type, size, decay) {
             const sampleRate = audioContext.sampleRate;
             let length, decayFactor;
             
             if (type === 'spring') {
-                // Spring reverb: shorter, more metallic
-                length = sampleRate * (1 + size * 1.5);
-                decayFactor = 2 + (decay * 4);
+                // Spring reverb: SHORT, BRIGHT, METALLIC with resonances
+                length = sampleRate * (0.3 + size * 0.8); // Much shorter
+                decayFactor = 1.5 + (decay * 2.5); // Faster decay
             } else {
-                // Lexicon PCM 70: longer, smoother
-                length = sampleRate * (2 + size * 3);
-                decayFactor = 3 + (decay * 5);
+                // Lexicon PCM 70: LONG, SMOOTH, DIFFUSE plate-like reverb
+                length = sampleRate * (1.5 + size * 4); // Much longer
+                decayFactor = 2.5 + (decay * 6); // Slower decay
             }
             
             const impulse = audioContext.createBuffer(2, length, sampleRate);
@@ -746,19 +840,105 @@
                 const channelData = impulse.getChannelData(channel);
                 for (let i = 0; i < length; i++) {
                     const noise = Math.random() * 2 - 1;
+                    const progress = i / length;
+                    
                     if (type === 'spring') {
-                        // Add resonances for spring character
-                        const spring1 = Math.sin(i * 0.02) * 0.5;
-                        const spring2 = Math.sin(i * 0.015) * 0.3;
-                        channelData[i] = (noise + spring1 + spring2) * Math.exp(-decayFactor * i / length);
+                        // Multiple spring resonances (metallic character)
+                        const spring1 = Math.sin(i * 0.05) * 0.6;
+                        const spring2 = Math.sin(i * 0.03) * 0.4;
+                        const spring3 = Math.sin(i * 0.07) * 0.2;
+                        // Early reflections more pronounced
+                        const earlyBoost = progress < 0.1 ? 1.5 : 1;
+                        channelData[i] = (noise + spring1 + spring2 + spring3) * 
+                                        Math.exp(-decayFactor * i / length) * earlyBoost;
                     } else {
-                        // Smoother decay for PCM 70
-                        channelData[i] = noise * Math.exp(-decayFactor * i / length);
+                        // PCM 70: Smooth diffusion with late reflections
+                        const diffusion1 = Math.sin(i * 0.001 + channel) * 0.3;
+                        const diffusion2 = Math.cos(i * 0.0015 - channel) * 0.2;
+                        // Gradual buildup of tail (plate character)
+                        const lateTail = progress > 0.2 ? 1 + (progress * 0.5) : 1;
+                        channelData[i] = (noise + diffusion1 + diffusion2) * 
+                                        Math.exp(-decayFactor * i / length) * lateTail;
                     }
                 }
             }
             
             return impulse;
+        }
+
+        // Setup delay character based on type
+        function setupDelayCharacter(type) {
+            if (!audioContext) return;
+
+            // Clean up existing character nodes
+            if (delayWowLFO) {
+                delayWowLFO.stop();
+                delayWowLFO.disconnect();
+            }
+            if (delayWowGain) delayWowGain.disconnect();
+            if (delaySaturation) delaySaturation.disconnect();
+            if (delayFilter) delayFilter.disconnect();
+
+            if (type === 'space-echo') {
+                // SPACE ECHO: Warm tape delay with wow/flutter and saturation
+                
+                // Wow/flutter LFO
+                delayWowLFO = audioContext.createOscillator();
+                delayWowLFO.frequency.value = 0.5; // Slow flutter
+                delayWowGain = audioContext.createGain();
+                delayWowGain.gain.value = 3; // Pitch modulation amount
+                
+                delayWowLFO.connect(delayWowGain);
+                delayWowGain.connect(delayNode.delayTime);
+                delayWowLFO.start();
+                
+                // Tape saturation
+                delaySaturation = audioContext.createWaveShaper();
+                delaySaturation.curve = createTapeSaturation();
+                delaySaturation.oversample = '4x';
+                
+                // Warm filtering (tape head losses)
+                delayFilter = audioContext.createBiquadFilter();
+                delayFilter.type = 'lowpass';
+                delayFilter.frequency.value = 3500; // Roll off highs
+                delayFilter.Q.value = 0.7;
+                
+                // Reconnect with character
+                delayNode.disconnect();
+                delayNode.connect(delaySaturation);
+                delaySaturation.connect(delayFilter);
+                delayFilter.connect(delayFeedbackGain);
+                delayFilter.connect(delayWetGain);
+                
+            } else {
+                // PRIME TIME: Clean digital delay with subtle modulation
+                
+                // Subtle chorus-like modulation
+                delayWowLFO = audioContext.createOscillator();
+                delayWowLFO.frequency.value = 1.5; // Faster than Space Echo
+                delayWowGain = audioContext.createGain();
+                delayWowGain.gain.value = 0.8; // Less modulation
+                
+                delayWowLFO.connect(delayWowGain);
+                delayWowGain.connect(delayNode.delayTime);
+                delayWowLFO.start();
+                
+                // High-pass for clarity (digital character)
+                delayFilter = audioContext.createBiquadFilter();
+                delayFilter.type = 'highpass';
+                delayFilter.frequency.value = 80;
+                delayFilter.Q.value = 0.5;
+                
+                // Clean path (no saturation)
+                delayNode.disconnect();
+                delayNode.connect(delayFilter);
+                delayFilter.connect(delayFeedbackGain);
+                delayFilter.connect(delayWetGain);
+            }
+            
+            // Reconnect feedback
+            delayFeedbackGain.disconnect();
+            delayFeedbackGain.connect(delayNode);
         }
 
         // Initialize audio
@@ -782,10 +962,8 @@
                 delayWetGain.gain.value = synthParams.delayMix;
                 delayDryGain.gain.value = 1 - synthParams.delayMix;
                 
-                // Delay routing
-                delayNode.connect(delayFeedbackGain);
-                delayFeedbackGain.connect(delayNode);
-                delayNode.connect(delayWetGain);
+                // Setup delay character
+                setupDelayCharacter(synthParams.delayType);
                 
                 // Reverb setup
                 convolver = audioContext.createConvolver();
@@ -824,20 +1002,17 @@
 
         // Create complex Buchla-style oscillator
         function createBuchlaOscillator(frequency, now) {
-            // Primary complex oscillator with multiple partials
             const osc1 = audioContext.createOscillator();
             const osc2 = audioContext.createOscillator();
             const osc3 = audioContext.createOscillator();
             
-            // Create rich, complex tones typical of Buchla
             osc1.type = 'triangle';
             osc2.type = 'sawtooth';
             osc3.type = 'sine';
             
-            // Buchla-style detuning for chorus effect
             osc1.frequency.setValueAtTime(frequency, now);
             osc2.frequency.setValueAtTime(frequency * 1.005, now);
-            osc3.frequency.setValueAtTime(frequency * 2.01, now); // Adds harmonic content
+            osc3.frequency.setValueAtTime(frequency * 2.01, now);
             
             return { osc1, osc2, osc3 };
         }
@@ -846,7 +1021,6 @@
         function playNote(frequency, lane) {
             if (!audioContext) return;
             
-            // Safety check: ensure frequency is finite and in valid range
             if (!isFinite(frequency) || frequency < 20 || frequency > 20000) {
                 console.warn('Invalid frequency:', frequency);
                 return;
@@ -854,31 +1028,25 @@
             
             const now = audioContext.currentTime;
             
-            // Create complex Buchla oscillators
             const { osc1, osc2, osc3 } = createBuchlaOscillator(frequency, now);
             
-            // FM oscillator
             const fmOsc = audioContext.createOscillator();
             fmOsc.type = 'sine';
             fmOsc.frequency.setValueAtTime(frequency * synthParams.fmRatio, now);
             
-            // FM modulation
             const fmGain = audioContext.createGain();
             const fmGainValue = synthParams.fmAmount * frequency * 2;
             fmGain.gain.setValueAtTime(isFinite(fmGainValue) ? fmGainValue : 0, now);
             
-            // Oscillator mixing
             const osc1Gain = audioContext.createGain();
             const osc2Gain = audioContext.createGain();
             const osc3Gain = audioContext.createGain();
             
             const mix = synthParams.oscMix;
-            // Mix emphasizes different harmonics
             osc1Gain.gain.value = 0.4 * (1 - mix * 0.5);
             osc2Gain.gain.value = 0.35 * (1 - mix * 0.7);
             osc3Gain.gain.value = 0.25 + (mix * 0.3);
             
-            // Waveshaper for folding
             const waveshaper = audioContext.createWaveShaper();
             const curve = new Float32Array(256);
             const wavefoldAmount = synthParams.wavefold / 100;
@@ -888,14 +1056,11 @@
             }
             waveshaper.curve = curve;
             
-            // LOW PASS GATE - This is the key Buchla element
-            // The LPG combines VCF and VCA in one circuit
             const lpgFilter = audioContext.createBiquadFilter();
             lpgFilter.type = 'lowpass';
             lpgFilter.frequency.setValueAtTime(synthParams.lpgCutoff, now);
             lpgFilter.Q.setValueAtTime(synthParams.lpgResonance, now);
             
-            // LPG control envelope (affects both filter and amplitude)
             const lpgEnvelope = audioContext.createGain();
             lpgEnvelope.gain.setValueAtTime(0, now);
             lpgEnvelope.gain.linearRampToValueAtTime(1, now + synthParams.attack);
@@ -904,9 +1069,8 @@
                 now + synthParams.attack + synthParams.decay
             );
             
-            // LPG filter tracking (typical Buchla behavior)
             const lpgFilterEnvAmount = synthParams.lpgCutoff * 4;
-            const minFilterFreq = 50; // Minimum safe frequency for filter
+            const minFilterFreq = 50;
             lpgFilter.frequency.setValueAtTime(minFilterFreq, now);
             lpgFilter.frequency.exponentialRampToValueAtTime(
                 Math.max(minFilterFreq, synthParams.lpgCutoff + lpgFilterEnvAmount), 
@@ -917,43 +1081,33 @@
                 now + synthParams.attack + synthParams.decay
             );
             
-            // VCA after LPG (classic Buchla architecture)
             const vca = audioContext.createGain();
             vca.gain.value = synthParams.vcaLevel;
             
-            // Connect FM
             fmOsc.connect(fmGain);
             fmGain.connect(osc1.frequency);
             fmGain.connect(osc2.frequency);
             
-            // Connect oscillators
             osc1.connect(osc1Gain);
             osc2.connect(osc2Gain);
             osc3.connect(osc3Gain);
             
-            // Mix and wavefold
             osc1Gain.connect(waveshaper);
             osc2Gain.connect(waveshaper);
             osc3Gain.connect(waveshaper);
             
-            // Through LPG
             waveshaper.connect(lpgFilter);
             lpgFilter.connect(lpgEnvelope);
-            
-            // Through VCA
             lpgEnvelope.connect(vca);
             
-            // To effects chain
             vca.connect(delayDryGain);
             vca.connect(delayNode);
             
-            // Start oscillators
             osc1.start(now);
             osc2.start(now);
             osc3.start(now);
             fmOsc.start(now);
             
-            // Stop after release
             const stopTime = now + synthParams.attack + synthParams.decay + synthParams.release;
             lpgEnvelope.gain.linearRampToValueAtTime(0, stopTime);
             
@@ -982,27 +1136,20 @@
                 finalOctave += octaveShift;
             }
             
-            // Apply transpose from performance knobs
             let transposedNoteValue = pulseNoteValue + lanes[laneIndex].transpose;
             
-            // Handle negative values properly for modulo
             const scaleLength = currentScale.length;
             transposedNoteValue = ((transposedNoteValue % scaleLength) + scaleLength) % scaleLength;
             
-            // Calculate octave offset from transpose
             const transposeOctaveOffset = Math.floor((pulseNoteValue + lanes[laneIndex].transpose) / scaleLength);
             
             const note = currentScale[transposedNoteValue] + synthParams.rootNote;
             const octaveOffset = Math.floor(pulseNoteValue / currentScale.length) + transposeOctaveOffset;
             const midiNote = (finalOctave + octaveOffset) * 12 + note;
             
-            // Clamp MIDI note to valid range (0-127)
             const clampedMidiNote = Math.max(0, Math.min(127, midiNote));
-            
-            // Calculate frequency with safety check
             const frequency = 440 * Math.pow(2, (clampedMidiNote - 69) / 12);
             
-            // Return a safe frequency value (clamp between 20Hz and 20kHz)
             return Math.max(20, Math.min(20000, frequency));
         }
 
@@ -1063,15 +1210,12 @@
                     const range = control.max - control.min;
                     let randomValue = control.min + (Math.random() * range);
                     
-                    // Apply step rounding if step is defined
                     if (control.step) {
                         randomValue = Math.round(randomValue / control.step) * control.step;
                     }
                     
-                    // Update the synth parameter
                     updateSynthParam(control.id, randomValue);
                     
-                    // Update the knob visual and display
                     const knob = document.getElementById(control.id + 'Knob');
                     const display = document.getElementById(control.id + 'Val');
                     if (knob && knob._knobInstance) {
@@ -1082,6 +1226,164 @@
                     }
                 }
             });
+        }
+
+        // SAVE/LOAD SYSTEM
+        function savePreset() {
+            const preset = {
+                version: '1.0',
+                synthParams: { ...synthParams },
+                lanes: lanes.map(lane => ({
+                    steps: lane.steps,
+                    pulses: lane.pulses,
+                    rotation: lane.rotation,
+                    octave: lane.octave,
+                    randomness: lane.randomness,
+                    transpose: lane.transpose,
+                    noteValues: [...lane.noteValues]
+                })),
+                scale: {
+                    rootNote: synthParams.rootNote,
+                    scaleType: document.getElementById('scaleSelect').value,
+                    customScale: document.getElementById('customScale').value
+                }
+            };
+
+            const dataStr = JSON.stringify(preset, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `ukla-preset-${Date.now()}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function loadPreset(presetData) {
+            try {
+                const preset = typeof presetData === 'string' ? JSON.parse(presetData) : presetData;
+
+                // Load synth params
+                Object.keys(preset.synthParams).forEach(key => {
+                    if (synthParams.hasOwnProperty(key)) {
+                        synthParams[key] = preset.synthParams[key];
+                    }
+                });
+
+                // Update all synth control knobs and displays
+                synthControls.forEach(control => {
+                    const knob = document.getElementById(control.id + 'Knob');
+                    const display = document.getElementById(control.id + 'Val');
+                    let value;
+                    
+                    if (control.id === 'oscMix' || control.id === 'wavefold' || 
+                        control.id === 'fmAmount' || control.id === 'vcaLevel' || 
+                        control.id === 'volume') {
+                        value = synthParams[control.id] * 100;
+                    } else {
+                        value = synthParams[control.id];
+                    }
+                    
+                    if (knob && knob._knobInstance) {
+                        knob._knobInstance.setValue(value);
+                    }
+                    if (display) {
+                        display.textContent = control.format(value);
+                    }
+                });
+
+                // Update effects knobs
+                const effectsKnobs = {
+                    delayTime: { knob: 'delayTimeKnob', display: 'delayTimeVal', mult: 1000, format: v => Math.round(v) + ' ms' },
+                    delayFeedback: { knob: 'delayFeedbackKnob', display: 'delayFeedbackVal', mult: 100, format: v => Math.round(v) + '%' },
+                    delayMix: { knob: 'delayMixKnob', display: 'delayMixVal', mult: 100, format: v => Math.round(v) + '%' },
+                    reverbSize: { knob: 'reverbSizeKnob', display: 'reverbSizeVal', mult: 100, format: v => Math.round(v) + '%' },
+                    reverbDecay: { knob: 'reverbDecayKnob', display: 'reverbDecayVal', mult: 100, format: v => Math.round(v) + '%' },
+                    reverbMix: { knob: 'reverbMixKnob', display: 'reverbMixVal', mult: 100, format: v => Math.round(v) + '%' }
+                };
+
+                Object.keys(effectsKnobs).forEach(key => {
+                    const config = effectsKnobs[key];
+                    const knob = document.getElementById(config.knob);
+                    const display = document.getElementById(config.display);
+                    const value = synthParams[key] * config.mult;
+                    
+                    if (knob && knob._knobInstance) {
+                        knob._knobInstance.setValue(value);
+                    }
+                    if (display) {
+                        display.textContent = config.format(value);
+                    }
+                });
+
+                // Update tempo
+                document.getElementById('tempoKnob')._knobInstance.setValue(synthParams.tempo);
+                document.getElementById('tempoDisplay').textContent = synthParams.tempo;
+
+                // Load lanes
+                preset.lanes.forEach((laneData, i) => {
+                    if (i < lanes.length) {
+                        lanes[i].steps = laneData.steps;
+                        lanes[i].pulses = laneData.pulses;
+                        lanes[i].rotation = laneData.rotation;
+                        lanes[i].octave = laneData.octave;
+                        lanes[i].randomness = laneData.randomness;
+                        lanes[i].transpose = laneData.transpose;
+                        lanes[i].noteValues = [...laneData.noteValues];
+                    }
+                });
+
+                // Load scale settings
+                if (preset.scale) {
+                    synthParams.rootNote = preset.scale.rootNote;
+                    document.getElementById('rootNote').value = preset.scale.rootNote;
+                    document.getElementById('scaleSelect').value = preset.scale.scaleType;
+                    document.getElementById('customScale').value = preset.scale.customScale || '';
+                    
+                    if (preset.scale.scaleType === 'custom') {
+                        document.getElementById('customScaleContainer').style.display = 'block';
+                    } else {
+                        document.getElementById('customScaleContainer').style.display = 'none';
+                    }
+                }
+
+                // Load delay/reverb types
+                document.getElementById('delayType').value = synthParams.delayType;
+                document.getElementById('reverbType').value = synthParams.reverbType;
+
+                // Recreate sequencer UI
+                createSequencerUI();
+
+                // Update transpose knobs
+                for (let i = 0; i < 5; i++) {
+                    const knob = document.getElementById(`transpose${i}Knob`);
+                    const display = document.getElementById(`transpose${i}Val`);
+                    if (knob && knob._knobInstance) {
+                        knob._knobInstance.setValue(lanes[i].transpose);
+                    }
+                    if (display) {
+                        const val = lanes[i].transpose;
+                        display.textContent = val > 0 ? '+' + val : val.toString();
+                    }
+                }
+
+                // Update audio context if already initialized
+                if (audioContext) {
+                    masterGain.gain.value = synthParams.volume;
+                    delayNode.delayTime.value = synthParams.delayTime;
+                    delayFeedbackGain.gain.value = synthParams.delayFeedback;
+                    delayWetGain.gain.value = synthParams.delayMix;
+                    reverbWetGain.gain.value = synthParams.reverbMix;
+                    
+                    setupDelayCharacter(synthParams.delayType);
+                    convolver.buffer = createReverbBuffer(synthParams.reverbType, synthParams.reverbSize, synthParams.reverbDecay);
+                }
+
+                console.log('Preset loaded successfully');
+            } catch (error) {
+                console.error('Error loading preset:', error);
+                alert('Error loading preset file');
+            }
         }
 
         // Create sequencer UI
@@ -1143,12 +1445,10 @@
                 laneDiv.innerHTML = laneHTML;
                 sequencer.appendChild(laneDiv);
                 
-                // Dice button
                 laneDiv.querySelector('.dice-btn').addEventListener('click', () => {
                     randomizeLaneNotes(laneIndex);
                 });
                 
-                // Create knobs
                 new Knob(
                     laneDiv.querySelector('.lane-steps-knob'),
                     1, 32, lane.steps,
@@ -1284,7 +1584,6 @@
 
         // Create effects controls
         function createEffectsControls() {
-            // Delay time
             const delayTimeKnob = new Knob(
                 document.getElementById('delayTimeKnob'),
                 10, 1000, 250,
@@ -1296,8 +1595,8 @@
                     document.getElementById('delayTimeVal').textContent = Math.round(value) + ' ms';
                 }
             );
+            document.getElementById('delayTimeKnob')._knobInstance = delayTimeKnob;
             
-            // Delay feedback
             const delayFeedbackKnob = new Knob(
                 document.getElementById('delayFeedbackKnob'),
                 0, 90, 30,
@@ -1309,8 +1608,8 @@
                     document.getElementById('delayFeedbackVal').textContent = Math.round(value) + '%';
                 }
             );
+            document.getElementById('delayFeedbackKnob')._knobInstance = delayFeedbackKnob;
             
-            // Delay mix
             const delayMixKnob = new Knob(
                 document.getElementById('delayMixKnob'),
                 0, 100, 20,
@@ -1322,8 +1621,8 @@
                     document.getElementById('delayMixVal').textContent = Math.round(value) + '%';
                 }
             );
+            document.getElementById('delayMixKnob')._knobInstance = delayMixKnob;
             
-            // Reverb size
             const reverbSizeKnob = new Knob(
                 document.getElementById('reverbSizeKnob'),
                 0, 100, 50,
@@ -1335,8 +1634,8 @@
                     document.getElementById('reverbSizeVal').textContent = Math.round(value) + '%';
                 }
             );
+            document.getElementById('reverbSizeKnob')._knobInstance = reverbSizeKnob;
             
-            // Reverb decay
             const reverbDecayKnob = new Knob(
                 document.getElementById('reverbDecayKnob'),
                 0, 100, 50,
@@ -1348,8 +1647,8 @@
                     document.getElementById('reverbDecayVal').textContent = Math.round(value) + '%';
                 }
             );
+            document.getElementById('reverbDecayKnob')._knobInstance = reverbDecayKnob;
             
-            // Reverb mix
             const reverbMixKnob = new Knob(
                 document.getElementById('reverbMixKnob'),
                 0, 100, 20,
@@ -1361,6 +1660,7 @@
                     document.getElementById('reverbMixVal').textContent = Math.round(value) + '%';
                 }
             );
+            document.getElementById('reverbMixKnob')._knobInstance = reverbMixKnob;
         }
 
         // Update synth parameter
@@ -1437,6 +1737,7 @@
                 }
             }
         );
+        document.getElementById('tempoKnob')._knobInstance = tempoKnob;
 
         // Start/Stop
         document.getElementById('startBtn').addEventListener('click', () => {
@@ -1462,10 +1763,30 @@
             });
         });
 
+        // Save/Load buttons
+        document.getElementById('saveBtn').addEventListener('click', savePreset);
+        
+        document.getElementById('loadBtn').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    loadPreset(event.target.result);
+                };
+                reader.readAsText(file);
+            }
+        });
+
         // Delay type change
         document.getElementById('delayType').addEventListener('change', (e) => {
             synthParams.delayType = e.target.value;
-            // Apply delay character changes (Space Echo has more warmth/saturation)
+            if (audioContext) {
+                setupDelayCharacter(synthParams.delayType);
+            }
         });
 
         // Reverb type change
@@ -1479,7 +1800,7 @@
         // Create performance knobs
         function createPerformanceKnobs() {
             for (let i = 0; i < 5; i++) {
-                new Knob(
+                const knobInstance = new Knob(
                     document.getElementById(`transpose${i}Knob`),
                     -12, 12, 0,
                     (value) => {
@@ -1488,6 +1809,7 @@
                             value > 0 ? '+' + Math.round(value) : Math.round(value).toString();
                     }
                 );
+                document.getElementById(`transpose${i}Knob`)._knobInstance = knobInstance;
             }
         }
 
@@ -1524,4 +1846,3 @@
     </script>
 </body>
 </html>
-        
