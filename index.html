@@ -352,29 +352,7 @@
             border-top: 1px solid #1a1a1a;
         }
 
-        .effect-selector {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .effect-label {
-            color: #666;
-            font-size: 0.7em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .fx-section {
-            margin-bottom: 30px;
-        }
-
         .fx-params {
-            display: none;
-        }
-
-        .fx-params.active {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 25px;
@@ -474,203 +452,96 @@
 
         <div class="control-group">
             <h3>DELAY</h3>
-            <div class="fx-section">
-                <div class="effect-selector">
-                    <span class="effect-label">DELAY TYPE</span>
-                    <select id="delayType">
-                        <option value="space-echo">Space Echo</option>
-                        <option value="prime-time">Lexicon Prime Time</option>
-                    </select>
+            <div class="fx-params">
+                <div class="knob-container">
+                    <span class="knob-label">TIME A</span>
+                    <div class="knob" id="delayTimeAKnob">
+                        <div class="knob-indicator"></div>
+                    </div>
+                    <span class="knob-value" id="delayTimeAVal">150 ms</span>
                 </div>
-                
-                <!-- Space Echo Controls -->
-                <div class="fx-params active" id="spaceEchoParams">
-                    <div class="knob-container">
-                        <span class="knob-label">TIME</span>
-                        <div class="knob" id="seTimeKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="seTimeVal">200 ms</span>
+                <div class="knob-container">
+                    <span class="knob-label">FB A</span>
+                    <div class="knob" id="delayFeedbackAKnob">
+                        <div class="knob-indicator"></div>
                     </div>
-                    <div class="knob-container">
-                        <span class="knob-label">FEEDBACK</span>
-                        <div class="knob" id="seFeedbackKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="seFeedbackVal">30%</span>
-                    </div>
-                    <div class="knob-container">
-                        <span class="knob-label">TAP 1</span>
-                        <div class="knob" id="seTap1Knob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="seTap1Val">50%</span>
-                    </div>
-                    <div class="knob-container">
-                        <span class="knob-label">TAP 2</span>
-                        <div class="knob" id="seTap2Knob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="seTap2Val">50%</span>
-                    </div>
-                    <div class="knob-container">
-                        <span class="knob-label">TAP 3</span>
-                        <div class="knob" id="seTap3Knob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="seTap3Val">50%</span>
-                    </div>
-                    <div class="knob-container">
-                        <span class="knob-label">MIX</span>
-                        <div class="knob" id="seMixKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="seMixVal">0%</span>
-                    </div>
+                    <span class="knob-value" id="delayFeedbackAVal">30%</span>
                 </div>
-
-                <!-- Prime Time Controls -->
-                <div class="fx-params" id="primeTimeParams">
-                    <div class="knob-container">
-                        <span class="knob-label">TIME A</span>
-                        <div class="knob" id="ptTimeAKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="ptTimeAVal">150 ms</span>
+                <div class="knob-container">
+                    <span class="knob-label">MOD RATE A</span>
+                    <div class="knob" id="delayModRateAKnob">
+                        <div class="knob-indicator"></div>
                     </div>
-                    <div class="knob-container">
-                        <span class="knob-label">FB A</span>
-                        <div class="knob" id="ptFeedbackAKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="ptFeedbackAVal">30%</span>
+                    <span class="knob-value" id="delayModRateAVal">0.5 Hz</span>
+                </div>
+                <div class="knob-container">
+                    <span class="knob-label">MOD DEPTH A</span>
+                    <div class="knob" id="delayModDepthAKnob">
+                        <div class="knob-indicator"></div>
                     </div>
-                    <div class="knob-container">
-                        <span class="knob-label">MOD RATE A</span>
-                        <div class="knob" id="ptModRateAKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="ptModRateAVal">0.5 Hz</span>
+                    <span class="knob-value" id="delayModDepthAVal">2 ms</span>
+                </div>
+                <div class="knob-container">
+                    <span class="knob-label">TIME B</span>
+                    <div class="knob" id="delayTimeBKnob">
+                        <div class="knob-indicator"></div>
                     </div>
-                    <div class="knob-container">
-                        <span class="knob-label">MOD DEPTH A</span>
-                        <div class="knob" id="ptModDepthAKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="ptModDepthAVal">2 ms</span>
+                    <span class="knob-value" id="delayTimeBVal">200 ms</span>
+                </div>
+                <div class="knob-container">
+                    <span class="knob-label">FB B</span>
+                    <div class="knob" id="delayFeedbackBKnob">
+                        <div class="knob-indicator"></div>
                     </div>
-                    <div class="knob-container">
-                        <span class="knob-label">TIME B</span>
-                        <div class="knob" id="ptTimeBKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="ptTimeBVal">200 ms</span>
+                    <span class="knob-value" id="delayFeedbackBVal">30%</span>
+                </div>
+                <div class="knob-container">
+                    <span class="knob-label">MOD RATE B</span>
+                    <div class="knob" id="delayModRateBKnob">
+                        <div class="knob-indicator"></div>
                     </div>
-                    <div class="knob-container">
-                        <span class="knob-label">FB B</span>
-                        <div class="knob" id="ptFeedbackBKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="ptFeedbackBVal">30%</span>
+                    <span class="knob-value" id="delayModRateBVal">0.7 Hz</span>
+                </div>
+                <div class="knob-container">
+                    <span class="knob-label">MOD DEPTH B</span>
+                    <div class="knob" id="delayModDepthBKnob">
+                        <div class="knob-indicator"></div>
                     </div>
-                    <div class="knob-container">
-                        <span class="knob-label">MOD RATE B</span>
-                        <div class="knob" id="ptModRateBKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="ptModRateBVal">0.7 Hz</span>
+                    <span class="knob-value" id="delayModDepthBVal">2 ms</span>
+                </div>
+                <div class="knob-container">
+                    <span class="knob-label">MIX</span>
+                    <div class="knob" id="delayMixKnob">
+                        <div class="knob-indicator"></div>
                     </div>
-                    <div class="knob-container">
-                        <span class="knob-label">MOD DEPTH B</span>
-                        <div class="knob" id="ptModDepthBKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="ptModDepthBVal">2 ms</span>
-                    </div>
-                    <div class="knob-container">
-                        <span class="knob-label">MIX</span>
-                        <div class="knob" id="ptMixKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="ptMixVal">0%</span>
-                    </div>
+                    <span class="knob-value" id="delayMixVal">0%</span>
                 </div>
             </div>
         </div>
 
         <div class="control-group">
             <h3>REVERB</h3>
-            <div class="fx-section">
-                <div class="effect-selector">
-                    <span class="effect-label">REVERB TYPE</span>
-                    <select id="reverbType">
-                        <option value="spring">Spring Reverb</option>
-                        <option value="pcm70">Lexicon PCM 70</option>
-                    </select>
+            <div class="fx-params">
+                <div class="knob-container">
+                    <span class="knob-label">ROOM SIZE</span>
+                    <div class="knob" id="reverbRoomSizeKnob">
+                        <div class="knob-indicator"></div>
+                    </div>
+                    <span class="knob-value" id="reverbRoomSizeVal">50%</span>
                 </div>
-
-                <!-- Spring Reverb Controls -->
-                <div class="fx-params active" id="springParams">
-                    <div class="knob-container">
-                        <span class="knob-label">DISPERSION</span>
-                        <div class="knob" id="springDispersionKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="springDispersionVal">50%</span>
+                <div class="knob-container">
+                    <span class="knob-label">DAMPING</span>
+                    <div class="knob" id="reverbDampingKnob">
+                        <div class="knob-indicator"></div>
                     </div>
-                    <div class="knob-container">
-                        <span class="knob-label">RESONANCE</span>
-                        <div class="knob" id="springResonanceKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="springResonanceVal">800 Hz</span>
-                    </div>
-                    <div class="knob-container">
-                        <span class="knob-label">FEEDBACK</span>
-                        <div class="knob" id="springFeedbackKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="springFeedbackVal">40%</span>
-                    </div>
-                    <div class="knob-container">
-                        <span class="knob-label">MIX</span>
-                        <div class="knob" id="springMixKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="springMixVal">0%</span>
-                    </div>
+                    <span class="knob-value" id="reverbDampingVal">50%</span>
                 </div>
-
-                <!-- PCM 70 Controls -->
-                <div class="fx-params" id="pcm70Params">
-                    <div class="knob-container">
-                        <span class="knob-label">SIZE</span>
-                        <div class="knob" id="pcm70SizeKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="pcm70SizeVal">50%</span>
+                <div class="knob-container">
+                    <span class="knob-label">MIX</span>
+                    <div class="knob" id="reverbMixKnob">
+                        <div class="knob-indicator"></div>
                     </div>
-                    <div class="knob-container">
-                        <span class="knob-label">DECAY</span>
-                        <div class="knob" id="pcm70DecayKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="pcm70DecayVal">50%</span>
-                    </div>
-                    <div class="knob-container">
-                        <span class="knob-label">DIFFUSION</span>
-                        <div class="knob" id="pcm70DiffusionKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="pcm70DiffusionVal">70%</span>
-                    </div>
-                    <div class="knob-container">
-                        <span class="knob-label">MIX</span>
-                        <div class="knob" id="pcm70MixKnob">
-                            <div class="knob-indicator"></div>
-                        </div>
-                        <span class="knob-value" id="pcm70MixVal">0%</span>
-                    </div>
+                    <span class="knob-value" id="reverbMixVal">0%</span>
                 </div>
             </div>
         </div>
@@ -737,25 +608,17 @@
         let delayDryGain, delayWetGain;
         let reverbDryGain, reverbWetGain;
         
-        // Space Echo nodes
-        let seTap1, seTap2, seTap3;
-        let seTap1Gain, seTap2Gain, seTap3Gain;
-        let seFeedbackGain, seSaturation, seFilter, seWowLFO, seWowGain;
+        // Delay nodes
+        let delayA, delayB;
+        let delayFeedbackA, delayFeedbackB;
+        let delayLFO_A, delayLFO_B;
+        let delayModGainA, delayModGainB;
+        let delayMixA, delayMixB;
         
-        // Prime Time nodes
-        let ptDelayA, ptDelayB;
-        let ptFeedbackA, ptFeedbackB;
-        let ptLFO_A, ptLFO_B;
-        let ptModGainA, ptModGainB;
-        let ptMixA, ptMixB;
-        
-        // Spring Reverb nodes
-        let springAllpass1, springAllpass2, springAllpass3, springAllpass4;
-        let springDelay, springBandpass, springFeedbackGain;
-        
-        // PCM 70 nodes
-        let pcm70Combs = [];
-        let pcm70Allpasses = [];
+        // Freeverb nodes
+        let freeverbCombs = [];
+        let freeverbAllpasses = [];
+        let freeverbDampingFilters = [];
 
         // Scales
         const scales = {
@@ -794,38 +657,21 @@
             rootNote: 0,
             tempo: 120,
             
-            // Space Echo params
-            delayType: 'space-echo',
-            seTime: 0.2,
-            seFeedback: 0.3,
-            seTap1Level: 0.5,
-            seTap2Level: 0.5,
-            seTap3Level: 0.5,
-            seMix: 0,
+            // Delay params
+            delayTimeA: 0.15,
+            delayFeedbackA: 0.3,
+            delayModRateA: 0.5,
+            delayModDepthA: 0.002,
+            delayTimeB: 0.2,
+            delayFeedbackB: 0.3,
+            delayModRateB: 0.7,
+            delayModDepthB: 0.002,
+            delayMix: 0,
             
-            // Prime Time params
-            ptTimeA: 0.15,
-            ptFeedbackA: 0.3,
-            ptModRateA: 0.5,
-            ptModDepthA: 0.002,
-            ptTimeB: 0.2,
-            ptFeedbackB: 0.3,
-            ptModRateB: 0.7,
-            ptModDepthB: 0.002,
-            ptMix: 0,
-            
-            // Spring Reverb params
-            reverbType: 'spring',
-            springDispersion: 0.5,
-            springResonance: 800,
-            springFeedback: 0.4,
-            springMix: 0,
-            
-            // PCM 70 params
-            pcm70Size: 0.5,
-            pcm70Decay: 0.5,
-            pcm70Diffusion: 0.7,
-            pcm70Mix: 0
+            // Freeverb params
+            reverbRoomSize: 0.5,
+            reverbDamping: 0.5,
+            reverbMix: 0
         };
 
         // Lane configuration
@@ -988,295 +834,172 @@
             return [...pattern.slice(rot), ...pattern.slice(0, rot)];
         }
 
-        // SPACE ECHO - Multi-tap tape delay
-        function buildSpaceEcho() {
+        // DELAY - Dual independent delay lines with modulation
+        function buildDelay() {
             if (!audioContext) return;
 
             // Clean up existing
-            if (seTap1) {
-                [seTap1, seTap2, seTap3].forEach(n => { n.disconnect(); });
-                [seTap1Gain, seTap2Gain, seTap3Gain].forEach(n => { n.disconnect(); });
-                seFeedbackGain.disconnect();
-                seSaturation.disconnect();
-                seFilter.disconnect();
-                if (seWowLFO) {
-                    seWowLFO.stop();
-                    seWowLFO.disconnect();
-                    seWowGain.disconnect();
+            if (delayA) {
+                [delayA, delayB].forEach(n => { n.disconnect(); });
+                [delayFeedbackA, delayFeedbackB].forEach(n => { n.disconnect(); });
+                [delayMixA, delayMixB].forEach(n => { n.disconnect(); });
+                if (delayLFO_A) {
+                    delayLFO_A.stop();
+                    delayLFO_A.disconnect();
+                    delayModGainA.disconnect();
                 }
-            }
-
-            // Three delay taps in series
-            seTap1 = audioContext.createDelay(2.0);
-            seTap2 = audioContext.createDelay(2.0);
-            seTap3 = audioContext.createDelay(2.0);
-
-            const baseTime = synthParams.seTime;
-            seTap1.delayTime.value = baseTime;
-            seTap2.delayTime.value = baseTime;
-            seTap3.delayTime.value = baseTime;
-
-            // Tap gains
-            seTap1Gain = audioContext.createGain();
-            seTap2Gain = audioContext.createGain();
-            seTap3Gain = audioContext.createGain();
-            
-            seTap1Gain.gain.value = synthParams.seTap1Level;
-            seTap2Gain.gain.value = synthParams.seTap2Level;
-            seTap3Gain.gain.value = synthParams.seTap3Level;
-
-            // Feedback loop (from tap 3 only)
-            seFeedbackGain = audioContext.createGain();
-            seFeedbackGain.gain.value = synthParams.seFeedback;
-
-            // Tape saturation
-            seSaturation = audioContext.createWaveShaper();
-            const curve = new Float32Array(256);
-            for (let i = 0; i < 256; i++) {
-                const x = (i / 128) - 1;
-                curve[i] = Math.tanh(x * 1.5) * 0.85;
-            }
-            seSaturation.curve = curve;
-            seSaturation.oversample = '2x';
-
-            // Tape head loss filter
-            seFilter = audioContext.createBiquadFilter();
-            seFilter.type = 'lowpass';
-            seFilter.frequency.value = 3500;
-            seFilter.Q.value = 0.7;
-
-            // Wow/flutter
-            seWowLFO = audioContext.createOscillator();
-            seWowLFO.frequency.value = 0.4;
-            seWowGain = audioContext.createGain();
-            seWowGain.gain.value = 2;
-            seWowLFO.connect(seWowGain);
-            
-            // Modulate all three taps
-            seWowGain.connect(seTap1.delayTime);
-            seWowGain.connect(seTap2.delayTime);
-            seWowGain.connect(seTap3.delayTime);
-            seWowLFO.start();
-
-            // Chain the taps
-            seTap1.connect(seTap1Gain);
-            seTap1.connect(seTap2);
-            
-            seTap2.connect(seTap2Gain);
-            seTap2.connect(seTap3);
-            
-            seTap3.connect(seTap3Gain);
-            seTap3.connect(seFeedbackGain);
-
-            // Feedback path
-            seFeedbackGain.connect(seSaturation);
-            seSaturation.connect(seFilter);
-            seFilter.connect(seTap1);
-
-            // All taps to wet output
-            seTap1Gain.connect(delayWetGain);
-            seTap2Gain.connect(delayWetGain);
-            seTap3Gain.connect(delayWetGain);
-        }
-
-        // PRIME TIME - Dual independent delay lines
-        function buildPrimeTime() {
-            if (!audioContext) return;
-
-            // Clean up existing
-            if (ptDelayA) {
-                [ptDelayA, ptDelayB].forEach(n => { n.disconnect(); });
-                [ptFeedbackA, ptFeedbackB].forEach(n => { n.disconnect(); });
-                [ptMixA, ptMixB].forEach(n => { n.disconnect(); });
-                if (ptLFO_A) {
-                    ptLFO_A.stop();
-                    ptLFO_A.disconnect();
-                    ptModGainA.disconnect();
-                }
-                if (ptLFO_B) {
-                    ptLFO_B.stop();
-                    ptLFO_B.disconnect();
-                    ptModGainB.disconnect();
+                if (delayLFO_B) {
+                    delayLFO_B.stop();
+                    delayLFO_B.disconnect();
+                    delayModGainB.disconnect();
                 }
             }
 
             // Delay Line A
-            ptDelayA = audioContext.createDelay(2.0);
-            ptDelayA.delayTime.value = synthParams.ptTimeA;
+            delayA = audioContext.createDelay(2.0);
+            delayA.delayTime.value = synthParams.delayTimeA;
             
-            ptFeedbackA = audioContext.createGain();
-            ptFeedbackA.gain.value = synthParams.ptFeedbackA;
+            delayFeedbackA = audioContext.createGain();
+            delayFeedbackA.gain.value = synthParams.delayFeedbackA;
             
-            ptMixA = audioContext.createGain();
-            ptMixA.gain.value = 0.5;
+            delayMixA = audioContext.createGain();
+            delayMixA.gain.value = 0.5;
 
             // LFO A
-            ptLFO_A = audioContext.createOscillator();
-            ptLFO_A.frequency.value = synthParams.ptModRateA;
-            ptModGainA = audioContext.createGain();
-            ptModGainA.gain.value = synthParams.ptModDepthA;
+            delayLFO_A = audioContext.createOscillator();
+            delayLFO_A.frequency.value = synthParams.delayModRateA;
+            delayModGainA = audioContext.createGain();
+            delayModGainA.gain.value = synthParams.delayModDepthA;
             
-            ptLFO_A.connect(ptModGainA);
-            ptModGainA.connect(ptDelayA.delayTime);
-            ptLFO_A.start();
+            delayLFO_A.connect(delayModGainA);
+            delayModGainA.connect(delayA.delayTime);
+            delayLFO_A.start();
 
             // Route A
-            ptDelayA.connect(ptFeedbackA);
-            ptFeedbackA.connect(ptDelayA);
-            ptDelayA.connect(ptMixA);
-            ptMixA.connect(delayWetGain);
+            delayA.connect(delayFeedbackA);
+            delayFeedbackA.connect(delayA);
+            delayA.connect(delayMixA);
+            delayMixA.connect(delayWetGain);
 
             // Delay Line B
-            ptDelayB = audioContext.createDelay(2.0);
-            ptDelayB.delayTime.value = synthParams.ptTimeB;
+            delayB = audioContext.createDelay(2.0);
+            delayB.delayTime.value = synthParams.delayTimeB;
             
-            ptFeedbackB = audioContext.createGain();
-            ptFeedbackB.gain.value = synthParams.ptFeedbackB;
+            delayFeedbackB = audioContext.createGain();
+            delayFeedbackB.gain.value = synthParams.delayFeedbackB;
             
-            ptMixB = audioContext.createGain();
-            ptMixB.gain.value = 0.5;
+            delayMixB = audioContext.createGain();
+            delayMixB.gain.value = 0.5;
 
             // LFO B
-            ptLFO_B = audioContext.createOscillator();
-            ptLFO_B.frequency.value = synthParams.ptModRateB;
-            ptModGainB = audioContext.createGain();
-            ptModGainB.gain.value = synthParams.ptModDepthB;
+            delayLFO_B = audioContext.createOscillator();
+            delayLFO_B.frequency.value = synthParams.delayModRateB;
+            delayModGainB = audioContext.createGain();
+            delayModGainB.gain.value = synthParams.delayModDepthB;
             
-            ptLFO_B.connect(ptModGainB);
-            ptModGainB.connect(ptDelayB.delayTime);
-            ptLFO_B.start();
+            delayLFO_B.connect(delayModGainB);
+            delayModGainB.connect(delayB.delayTime);
+            delayLFO_B.start();
 
             // Route B
-            ptDelayB.connect(ptFeedbackB);
-            ptFeedbackB.connect(ptDelayB);
-            ptDelayB.connect(ptMixB);
-            ptMixB.connect(delayWetGain);
+            delayB.connect(delayFeedbackB);
+            delayFeedbackB.connect(delayB);
+            delayB.connect(delayMixB);
+            delayMixB.connect(delayWetGain);
         }
 
-        // SPRING REVERB - Allpass chain with feedback
-        function buildSpringReverb() {
+        // FREEVERB - Classic Schroeder reverb with 8 combs + 4 allpass
+        function buildFreeverb() {
             if (!audioContext) return;
 
             // Clean up existing
-            if (springAllpass1) {
-                [springAllpass1, springAllpass2, springAllpass3, springAllpass4].forEach(n => { n.disconnect(); });
-                springDelay.disconnect();
-                springBandpass.disconnect();
-                springFeedbackGain.disconnect();
-            }
-
-            // Dispersion via allpass chain (high freq travels faster)
-            const dispersion = synthParams.springDispersion;
-            
-            springAllpass1 = audioContext.createBiquadFilter();
-            springAllpass1.type = 'allpass';
-            springAllpass1.frequency.value = 1000 + (dispersion * 2000);
-            
-            springAllpass2 = audioContext.createBiquadFilter();
-            springAllpass2.type = 'allpass';
-            springAllpass2.frequency.value = 800 + (dispersion * 1500);
-            
-            springAllpass3 = audioContext.createBiquadFilter();
-            springAllpass3.type = 'allpass';
-            springAllpass3.frequency.value = 600 + (dispersion * 1200);
-            
-            springAllpass4 = audioContext.createBiquadFilter();
-            springAllpass4.type = 'allpass';
-            springAllpass4.frequency.value = 400 + (dispersion * 1000);
-
-            // Feedback delay (spring length)
-            springDelay = audioContext.createDelay(0.5);
-            springDelay.delayTime.value = 0.02 + (dispersion * 0.03);
-
-            // Metallic resonance
-            springBandpass = audioContext.createBiquadFilter();
-            springBandpass.type = 'bandpass';
-            springBandpass.frequency.value = synthParams.springResonance;
-            springBandpass.Q.value = 8;
-
-            // Feedback
-            springFeedbackGain = audioContext.createGain();
-            springFeedbackGain.gain.value = synthParams.springFeedback;
-
-            // Chain
-            springAllpass1.connect(springAllpass2);
-            springAllpass2.connect(springAllpass3);
-            springAllpass3.connect(springAllpass4);
-            springAllpass4.connect(springDelay);
-            springDelay.connect(springBandpass);
-            springBandpass.connect(springFeedbackGain);
-            springFeedbackGain.connect(springAllpass1);
-
-            // Output
-            springBandpass.connect(reverbWetGain);
-        }
-
-        // PCM 70 - Schroeder reverb (comb + allpass)
-        function buildPCM70() {
-            if (!audioContext) return;
-
-            // Clean up existing
-            pcm70Combs.forEach(comb => {
+            freeverbCombs.forEach(comb => {
                 comb.delay.disconnect();
                 comb.feedback.disconnect();
+                comb.damping.disconnect();
+                comb.dampingGain.disconnect();
                 comb.gain.disconnect();
             });
-            pcm70Allpasses.forEach(ap => {
-                ap.disconnect();
+            freeverbAllpasses.forEach(ap => {
+                ap.delay.disconnect();
+                ap.feedback.disconnect();
             });
-            pcm70Combs = [];
-            pcm70Allpasses = [];
+            freeverbCombs = [];
+            freeverbAllpasses = [];
+            freeverbDampingFilters = [];
 
-            const size = synthParams.pcm70Size;
-            const decay = synthParams.pcm70Decay;
-            const diffusion = synthParams.pcm70Diffusion;
+            const roomSize = synthParams.reverbRoomSize;
+            const damping = synthParams.reverbDamping;
 
-            // 4 parallel comb filters
-            const combTimes = [
-                0.0297 * (1 + size),
-                0.0371 * (1 + size),
-                0.0411 * (1 + size),
-                0.0437 * (1 + size)
+            // Freeverb tuning values (in samples at 44.1kHz, scaled for time)
+            const sampleRate = audioContext.sampleRate;
+            const stereospread = 23 / sampleRate;
+            
+            // Comb filter delay times (Freeverb standard values)
+            const combTunings = [
+                1116 / sampleRate,
+                1188 / sampleRate,
+                1277 / sampleRate,
+                1356 / sampleRate,
+                1422 / sampleRate,
+                1491 / sampleRate,
+                1557 / sampleRate,
+                1617 / sampleRate
+            ];
+
+            // Allpass delay times
+            const allpassTunings = [
+                556 / sampleRate,
+                441 / sampleRate,
+                341 / sampleRate,
+                225 / sampleRate
             ];
 
             const combMixer = audioContext.createGain();
-            combMixer.gain.value = 0.25;
+            combMixer.gain.value = 0.125; // 1/8 for 8 combs
 
-            combTimes.forEach(time => {
+            // Build 8 parallel comb filters
+            combTunings.forEach(tuning => {
                 const delay = audioContext.createDelay(1.0);
-                delay.delayTime.value = time;
+                delay.delayTime.value = tuning * (1 + roomSize);
                 
                 const feedback = audioContext.createGain();
-                feedback.gain.value = 0.3 + (decay * 0.6);
+                feedback.gain.value = 0.5 + (roomSize * 0.28); // Freeverb feedback calculation
+                
+                // Damping lowpass filter
+                const dampingFilter = audioContext.createBiquadFilter();
+                dampingFilter.type = 'lowpass';
+                dampingFilter.frequency.value = 1000 + (1 - damping) * 10000;
+                dampingFilter.Q.value = 0.5;
+                
+                const dampingGain = audioContext.createGain();
+                dampingGain.gain.value = damping;
                 
                 const gain = audioContext.createGain();
                 gain.gain.value = 1;
 
-                delay.connect(feedback);
+                // Comb topology with damping
+                delay.connect(dampingFilter);
+                dampingFilter.connect(dampingGain);
+                dampingGain.connect(feedback);
                 feedback.connect(delay);
                 delay.connect(gain);
                 gain.connect(combMixer);
 
-                pcm70Combs.push({ delay, feedback, gain });
+                freeverbCombs.push({ delay, feedback, damping: dampingFilter, dampingGain, gain });
             });
 
-            // 3 serial allpass filters for diffusion
-            const apTimes = [
-                0.005 * (1 + diffusion * 0.5),
-                0.0089 * (1 + diffusion * 0.5),
-                0.0127 * (1 + diffusion * 0.5)
-            ];
-
+            // Build 4 serial allpass filters
             let apInput = combMixer;
-            apTimes.forEach(time => {
+            allpassTunings.forEach(tuning => {
                 const apDelay = audioContext.createDelay(0.5);
-                apDelay.delayTime.value = time;
+                apDelay.delayTime.value = tuning;
                 
                 const apFeedback = audioContext.createGain();
-                apFeedback.gain.value = 0.5 * diffusion;
+                apFeedback.gain.value = 0.5;
                 
                 const apFeedforward = audioContext.createGain();
-                apFeedforward.gain.value = -0.5 * diffusion;
+                apFeedforward.gain.value = -0.5;
                 
                 const apMixer = audioContext.createGain();
                 apMixer.gain.value = 1;
@@ -1289,7 +1012,7 @@
                 apDelay.connect(apMixer);
                 apFeedforward.connect(apMixer);
 
-                pcm70Allpasses.push(apDelay);
+                freeverbAllpasses.push({ delay: apDelay, feedback: apFeedback });
                 apInput = apMixer;
             });
 
@@ -1317,18 +1040,9 @@
                 reverbDryGain.gain.value = 1;
                 reverbWetGain.gain.value = 0;
 
-                // Build initial effects
-                if (synthParams.delayType === 'space-echo') {
-                    buildSpaceEcho();
-                } else {
-                    buildPrimeTime();
-                }
-
-                if (synthParams.reverbType === 'spring') {
-                    buildSpringReverb();
-                } else {
-                    buildPCM70();
-                }
+                // Build effects
+                buildDelay();
+                buildFreeverb();
 
                 // Connect routing
                 delayWetGain.connect(reverbDryGain);
@@ -1451,20 +1165,16 @@
             lpgFilter.connect(lpgEnvelope);
             lpgEnvelope.connect(vca);
             
-            // Route to effects based on current type
+            // Route to effects
             vca.connect(delayDryGain);
             
-            if (synthParams.delayType === 'space-echo' && seTap1) {
-                vca.connect(seTap1);
-            } else if (synthParams.delayType === 'prime-time' && ptDelayA) {
-                vca.connect(ptDelayA);
-                vca.connect(ptDelayB);
+            if (delayA) {
+                vca.connect(delayA);
+                vca.connect(delayB);
             }
             
-            if (synthParams.reverbType === 'spring' && springAllpass1) {
-                vca.connect(springAllpass1);
-            } else if (synthParams.reverbType === 'pcm70' && pcm70Combs.length > 0) {
-                pcm70Combs.forEach(comb => vca.connect(comb.delay));
+            if (freeverbCombs.length > 0) {
+                freeverbCombs.forEach(comb => vca.connect(comb.delay));
             }
             
             osc1.start(now);
@@ -1591,7 +1301,7 @@
         // SAVE/LOAD
         function savePreset() {
             const preset = {
-                version: '2.0',
+                version: '3.0',
                 synthParams: { ...synthParams },
                 lanes: lanes.map(lane => ({
                     steps: lane.steps,
@@ -1681,10 +1391,6 @@
                     }
                 }
 
-                document.getElementById('delayType').value = synthParams.delayType;
-                document.getElementById('reverbType').value = synthParams.reverbType;
-                
-                updateFXDisplay();
                 createSequencerUI();
 
                 for (let i = 0; i < 5; i++) {
@@ -1701,18 +1407,8 @@
 
                 if (audioContext) {
                     masterGain.gain.value = synthParams.volume;
-                    
-                    if (synthParams.delayType === 'space-echo') {
-                        buildSpaceEcho();
-                    } else {
-                        buildPrimeTime();
-                    }
-                    
-                    if (synthParams.reverbType === 'spring') {
-                        buildSpringReverb();
-                    } else {
-                        buildPCM70();
-                    }
+                    buildDelay();
+                    buildFreeverb();
                 }
 
                 console.log('Preset loaded successfully');
@@ -1723,85 +1419,46 @@
         }
 
         function updateAllFXKnobs() {
-            // Space Echo
-            if (document.getElementById('seTimeKnob')._knobInstance) {
-                document.getElementById('seTimeKnob')._knobInstance.setValue(synthParams.seTime * 1000);
-                document.getElementById('seTimeVal').textContent = Math.round(synthParams.seTime * 1000) + ' ms';
+            // Delay
+            if (document.getElementById('delayTimeAKnob')._knobInstance) {
+                document.getElementById('delayTimeAKnob')._knobInstance.setValue(synthParams.delayTimeA * 1000);
+                document.getElementById('delayTimeAVal').textContent = Math.round(synthParams.delayTimeA * 1000) + ' ms';
                 
-                document.getElementById('seFeedbackKnob')._knobInstance.setValue(synthParams.seFeedback * 100);
-                document.getElementById('seFeedbackVal').textContent = Math.round(synthParams.seFeedback * 100) + '%';
+                document.getElementById('delayFeedbackAKnob')._knobInstance.setValue(synthParams.delayFeedbackA * 100);
+                document.getElementById('delayFeedbackAVal').textContent = Math.round(synthParams.delayFeedbackA * 100) + '%';
                 
-                document.getElementById('seTap1Knob')._knobInstance.setValue(synthParams.seTap1Level * 100);
-                document.getElementById('seTap1Val').textContent = Math.round(synthParams.seTap1Level * 100) + '%';
+                document.getElementById('delayModRateAKnob')._knobInstance.setValue(synthParams.delayModRateA);
+                document.getElementById('delayModRateAVal').textContent = synthParams.delayModRateA.toFixed(1) + ' Hz';
                 
-                document.getElementById('seTap2Knob')._knobInstance.setValue(synthParams.seTap2Level * 100);
-                document.getElementById('seTap2Val').textContent = Math.round(synthParams.seTap2Level * 100) + '%';
+                document.getElementById('delayModDepthAKnob')._knobInstance.setValue(synthParams.delayModDepthA * 1000);
+                document.getElementById('delayModDepthAVal').textContent = Math.round(synthParams.delayModDepthA * 1000) + ' ms';
                 
-                document.getElementById('seTap3Knob')._knobInstance.setValue(synthParams.seTap3Level * 100);
-                document.getElementById('seTap3Val').textContent = Math.round(synthParams.seTap3Level * 100) + '%';
+                document.getElementById('delayTimeBKnob')._knobInstance.setValue(synthParams.delayTimeB * 1000);
+                document.getElementById('delayTimeBVal').textContent = Math.round(synthParams.delayTimeB * 1000) + ' ms';
                 
-                document.getElementById('seMixKnob')._knobInstance.setValue(synthParams.seMix * 100);
-                document.getElementById('seMixVal').textContent = Math.round(synthParams.seMix * 100) + '%';
+                document.getElementById('delayFeedbackBKnob')._knobInstance.setValue(synthParams.delayFeedbackB * 100);
+                document.getElementById('delayFeedbackBVal').textContent = Math.round(synthParams.delayFeedbackB * 100) + '%';
+                
+                document.getElementById('delayModRateBKnob')._knobInstance.setValue(synthParams.delayModRateB);
+                document.getElementById('delayModRateBVal').textContent = synthParams.delayModRateB.toFixed(1) + ' Hz';
+                
+                document.getElementById('delayModDepthBKnob')._knobInstance.setValue(synthParams.delayModDepthB * 1000);
+                document.getElementById('delayModDepthBVal').textContent = Math.round(synthParams.delayModDepthB * 1000) + ' ms';
+                
+                document.getElementById('delayMixKnob')._knobInstance.setValue(synthParams.delayMix * 100);
+                document.getElementById('delayMixVal').textContent = Math.round(synthParams.delayMix * 100) + '%';
             }
 
-            // Prime Time
-            if (document.getElementById('ptTimeAKnob')._knobInstance) {
-                document.getElementById('ptTimeAKnob')._knobInstance.setValue(synthParams.ptTimeA * 1000);
-                document.getElementById('ptTimeAVal').textContent = Math.round(synthParams.ptTimeA * 1000) + ' ms';
+            // Reverb
+            if (document.getElementById('reverbRoomSizeKnob')._knobInstance) {
+                document.getElementById('reverbRoomSizeKnob')._knobInstance.setValue(synthParams.reverbRoomSize * 100);
+                document.getElementById('reverbRoomSizeVal').textContent = Math.round(synthParams.reverbRoomSize * 100) + '%';
                 
-                document.getElementById('ptFeedbackAKnob')._knobInstance.setValue(synthParams.ptFeedbackA * 100);
-                document.getElementById('ptFeedbackAVal').textContent = Math.round(synthParams.ptFeedbackA * 100) + '%';
+                document.getElementById('reverbDampingKnob')._knobInstance.setValue(synthParams.reverbDamping * 100);
+                document.getElementById('reverbDampingVal').textContent = Math.round(synthParams.reverbDamping * 100) + '%';
                 
-                document.getElementById('ptModRateAKnob')._knobInstance.setValue(synthParams.ptModRateA);
-                document.getElementById('ptModRateAVal').textContent = synthParams.ptModRateA.toFixed(1) + ' Hz';
-                
-                document.getElementById('ptModDepthAKnob')._knobInstance.setValue(synthParams.ptModDepthA * 1000);
-                document.getElementById('ptModDepthAVal').textContent = Math.round(synthParams.ptModDepthA * 1000) + ' ms';
-                
-                document.getElementById('ptTimeBKnob')._knobInstance.setValue(synthParams.ptTimeB * 1000);
-                document.getElementById('ptTimeBVal').textContent = Math.round(synthParams.ptTimeB * 1000) + ' ms';
-                
-                document.getElementById('ptFeedbackBKnob')._knobInstance.setValue(synthParams.ptFeedbackB * 100);
-                document.getElementById('ptFeedbackBVal').textContent = Math.round(synthParams.ptFeedbackB * 100) + '%';
-                
-                document.getElementById('ptModRateBKnob')._knobInstance.setValue(synthParams.ptModRateB);
-                document.getElementById('ptModRateBVal').textContent = synthParams.ptModRateB.toFixed(1) + ' Hz';
-                
-                document.getElementById('ptModDepthBKnob')._knobInstance.setValue(synthParams.ptModDepthB * 1000);
-                document.getElementById('ptModDepthBVal').textContent = Math.round(synthParams.ptModDepthB * 1000) + ' ms';
-                
-                document.getElementById('ptMixKnob')._knobInstance.setValue(synthParams.ptMix * 100);
-                document.getElementById('ptMixVal').textContent = Math.round(synthParams.ptMix * 100) + '%';
-            }
-
-            // Spring
-            if (document.getElementById('springDispersionKnob')._knobInstance) {
-                document.getElementById('springDispersionKnob')._knobInstance.setValue(synthParams.springDispersion * 100);
-                document.getElementById('springDispersionVal').textContent = Math.round(synthParams.springDispersion * 100) + '%';
-                
-                document.getElementById('springResonanceKnob')._knobInstance.setValue(synthParams.springResonance);
-                document.getElementById('springResonanceVal').textContent = Math.round(synthParams.springResonance) + ' Hz';
-                
-                document.getElementById('springFeedbackKnob')._knobInstance.setValue(synthParams.springFeedback * 100);
-                document.getElementById('springFeedbackVal').textContent = Math.round(synthParams.springFeedback * 100) + '%';
-                
-                document.getElementById('springMixKnob')._knobInstance.setValue(synthParams.springMix * 100);
-                document.getElementById('springMixVal').textContent = Math.round(synthParams.springMix * 100) + '%';
-            }
-
-            // PCM 70
-            if (document.getElementById('pcm70SizeKnob')._knobInstance) {
-                document.getElementById('pcm70SizeKnob')._knobInstance.setValue(synthParams.pcm70Size * 100);
-                document.getElementById('pcm70SizeVal').textContent = Math.round(synthParams.pcm70Size * 100) + '%';
-                
-                document.getElementById('pcm70DecayKnob')._knobInstance.setValue(synthParams.pcm70Decay * 100);
-                document.getElementById('pcm70DecayVal').textContent = Math.round(synthParams.pcm70Decay * 100) + '%';
-                
-                document.getElementById('pcm70DiffusionKnob')._knobInstance.setValue(synthParams.pcm70Diffusion * 100);
-                document.getElementById('pcm70DiffusionVal').textContent = Math.round(synthParams.pcm70Diffusion * 100) + '%';
-                
-                document.getElementById('pcm70MixKnob')._knobInstance.setValue(synthParams.pcm70Mix * 100);
-                document.getElementById('pcm70MixVal').textContent = Math.round(synthParams.pcm70Mix * 100) + '%';
+                document.getElementById('reverbMixKnob')._knobInstance.setValue(synthParams.reverbMix * 100);
+                document.getElementById('reverbMixVal').textContent = Math.round(synthParams.reverbMix * 100) + '%';
             }
         }
 
@@ -2001,175 +1658,91 @@
 
         // Create FX controls
         function createFXControls() {
-            // SPACE ECHO
-            const seTimeKnob = new Knob(document.getElementById('seTimeKnob'), 50, 1000, 200, (v) => {
-                synthParams.seTime = v / 1000;
-                if (seTap1) {
-                    const baseTime = synthParams.seTime;
-                    seTap1.delayTime.value = baseTime;
-                    seTap2.delayTime.value = baseTime;
-                    seTap3.delayTime.value = baseTime;
-                }
-                document.getElementById('seTimeVal').textContent = Math.round(v) + ' ms';
+            // DELAY
+            const delayTimeAKnob = new Knob(document.getElementById('delayTimeAKnob'), 50, 1000, 150, (v) => {
+                synthParams.delayTimeA = v / 1000;
+                if (delayA) delayA.delayTime.value = synthParams.delayTimeA;
+                document.getElementById('delayTimeAVal').textContent = Math.round(v) + ' ms';
             });
-            document.getElementById('seTimeKnob')._knobInstance = seTimeKnob;
+            document.getElementById('delayTimeAKnob')._knobInstance = delayTimeAKnob;
 
-            const seFeedbackKnob = new Knob(document.getElementById('seFeedbackKnob'), 0, 90, 30, (v) => {
-                synthParams.seFeedback = v / 100;
-                if (seFeedbackGain) seFeedbackGain.gain.value = synthParams.seFeedback;
-                document.getElementById('seFeedbackVal').textContent = Math.round(v) + '%';
+            const delayFeedbackAKnob = new Knob(document.getElementById('delayFeedbackAKnob'), 0, 90, 30, (v) => {
+                synthParams.delayFeedbackA = v / 100;
+                if (delayFeedbackA) delayFeedbackA.gain.value = synthParams.delayFeedbackA;
+                document.getElementById('delayFeedbackAVal').textContent = Math.round(v) + '%';
             });
-            document.getElementById('seFeedbackKnob')._knobInstance = seFeedbackKnob;
+            document.getElementById('delayFeedbackAKnob')._knobInstance = delayFeedbackAKnob;
 
-            const seTap1Knob = new Knob(document.getElementById('seTap1Knob'), 0, 100, 50, (v) => {
-                synthParams.seTap1Level = v / 100;
-                if (seTap1Gain) seTap1Gain.gain.value = synthParams.seTap1Level;
-                document.getElementById('seTap1Val').textContent = Math.round(v) + '%';
-            });
-            document.getElementById('seTap1Knob')._knobInstance = seTap1Knob;
-
-            const seTap2Knob = new Knob(document.getElementById('seTap2Knob'), 0, 100, 50, (v) => {
-                synthParams.seTap2Level = v / 100;
-                if (seTap2Gain) seTap2Gain.gain.value = synthParams.seTap2Level;
-                document.getElementById('seTap2Val').textContent = Math.round(v) + '%';
-            });
-            document.getElementById('seTap2Knob')._knobInstance = seTap2Knob;
-
-            const seTap3Knob = new Knob(document.getElementById('seTap3Knob'), 0, 100, 50, (v) => {
-                synthParams.seTap3Level = v / 100;
-                if (seTap3Gain) seTap3Gain.gain.value = synthParams.seTap3Level;
-                document.getElementById('seTap3Val').textContent = Math.round(v) + '%';
-            });
-            document.getElementById('seTap3Knob')._knobInstance = seTap3Knob;
-
-            const seMixKnob = new Knob(document.getElementById('seMixKnob'), 0, 100, 0, (v) => {
-                synthParams.seMix = v / 100;
-                if (delayWetGain) delayWetGain.gain.value = synthParams.seMix;
-                document.getElementById('seMixVal').textContent = Math.round(v) + '%';
-            });
-            document.getElementById('seMixKnob')._knobInstance = seMixKnob;
-
-            // PRIME TIME
-            const ptTimeAKnob = new Knob(document.getElementById('ptTimeAKnob'), 50, 1000, 150, (v) => {
-                synthParams.ptTimeA = v / 1000;
-                if (ptDelayA) ptDelayA.delayTime.value = synthParams.ptTimeA;
-                document.getElementById('ptTimeAVal').textContent = Math.round(v) + ' ms';
-            });
-            document.getElementById('ptTimeAKnob')._knobInstance = ptTimeAKnob;
-
-            const ptFeedbackAKnob = new Knob(document.getElementById('ptFeedbackAKnob'), 0, 90, 30, (v) => {
-                synthParams.ptFeedbackA = v / 100;
-                if (ptFeedbackA) ptFeedbackA.gain.value = synthParams.ptFeedbackA;
-                document.getElementById('ptFeedbackAVal').textContent = Math.round(v) + '%';
-            });
-            document.getElementById('ptFeedbackAKnob')._knobInstance = ptFeedbackAKnob;
-
-            const ptModRateAKnob = new Knob(document.getElementById('ptModRateAKnob'), 0.1, 5, 0.5, (v) => {
-                synthParams.ptModRateA = v;
-                if (ptLFO_A) ptLFO_A.frequency.value = v;
-                document.getElementById('ptModRateAVal').textContent = v.toFixed(1) + ' Hz';
+            const delayModRateAKnob = new Knob(document.getElementById('delayModRateAKnob'), 0.1, 5, 0.5, (v) => {
+                synthParams.delayModRateA = v;
+                if (delayLFO_A) delayLFO_A.frequency.value = v;
+                document.getElementById('delayModRateAVal').textContent = v.toFixed(1) + ' Hz';
             }, 0.1);
-            document.getElementById('ptModRateAKnob')._knobInstance = ptModRateAKnob;
+            document.getElementById('delayModRateAKnob')._knobInstance = delayModRateAKnob;
 
-            const ptModDepthAKnob = new Knob(document.getElementById('ptModDepthAKnob'), 0, 20, 2, (v) => {
-                synthParams.ptModDepthA = v / 1000;
-                if (ptModGainA) ptModGainA.gain.value = synthParams.ptModDepthA;
-                document.getElementById('ptModDepthAVal').textContent = Math.round(v) + ' ms';
+            const delayModDepthAKnob = new Knob(document.getElementById('delayModDepthAKnob'), 0, 20, 2, (v) => {
+                synthParams.delayModDepthA = v / 1000;
+                if (delayModGainA) delayModGainA.gain.value = synthParams.delayModDepthA;
+                document.getElementById('delayModDepthAVal').textContent = Math.round(v) + ' ms';
             });
-            document.getElementById('ptModDepthAKnob')._knobInstance = ptModDepthAKnob;
+            document.getElementById('delayModDepthAKnob')._knobInstance = delayModDepthAKnob;
 
-            const ptTimeBKnob = new Knob(document.getElementById('ptTimeBKnob'), 50, 1000, 200, (v) => {
-                synthParams.ptTimeB = v / 1000;
-                if (ptDelayB) ptDelayB.delayTime.value = synthParams.ptTimeB;
-                document.getElementById('ptTimeBVal').textContent = Math.round(v) + ' ms';
+            const delayTimeBKnob = new Knob(document.getElementById('delayTimeBKnob'), 50, 1000, 200, (v) => {
+                synthParams.delayTimeB = v / 1000;
+                if (delayB) delayB.delayTime.value = synthParams.delayTimeB;
+                document.getElementById('delayTimeBVal').textContent = Math.round(v) + ' ms';
             });
-            document.getElementById('ptTimeBKnob')._knobInstance = ptTimeBKnob;
+            document.getElementById('delayTimeBKnob')._knobInstance = delayTimeBKnob;
 
-            const ptFeedbackBKnob = new Knob(document.getElementById('ptFeedbackBKnob'), 0, 90, 30, (v) => {
-                synthParams.ptFeedbackB = v / 100;
-                if (ptFeedbackB) ptFeedbackB.gain.value = synthParams.ptFeedbackB;
-                document.getElementById('ptFeedbackBVal').textContent = Math.round(v) + '%';
+            const delayFeedbackBKnob = new Knob(document.getElementById('delayFeedbackBKnob'), 0, 90, 30, (v) => {
+                synthParams.delayFeedbackB = v / 100;
+                if (delayFeedbackB) delayFeedbackB.gain.value = synthParams.delayFeedbackB;
+                document.getElementById('delayFeedbackBVal').textContent = Math.round(v) + '%';
             });
-            document.getElementById('ptFeedbackBKnob')._knobInstance = ptFeedbackBKnob;
+            document.getElementById('delayFeedbackBKnob')._knobInstance = delayFeedbackBKnob;
 
-            const ptModRateBKnob = new Knob(document.getElementById('ptModRateBKnob'), 0.1, 5, 0.7, (v) => {
-                synthParams.ptModRateB = v;
-                if (ptLFO_B) ptLFO_B.frequency.value = v;
-                document.getElementById('ptModRateBVal').textContent = v.toFixed(1) + ' Hz';
+            const delayModRateBKnob = new Knob(document.getElementById('delayModRateBKnob'), 0.1, 5, 0.7, (v) => {
+                synthParams.delayModRateB = v;
+                if (delayLFO_B) delayLFO_B.frequency.value = v;
+                document.getElementById('delayModRateBVal').textContent = v.toFixed(1) + ' Hz';
             }, 0.1);
-            document.getElementById('ptModRateBKnob')._knobInstance = ptModRateBKnob;
+            document.getElementById('delayModRateBKnob')._knobInstance = delayModRateBKnob;
 
-            const ptModDepthBKnob = new Knob(document.getElementById('ptModDepthBKnob'), 0, 20, 2, (v) => {
-                synthParams.ptModDepthB = v / 1000;
-                if (ptModGainB) ptModGainB.gain.value = synthParams.ptModDepthB;
-                document.getElementById('ptModDepthBVal').textContent = Math.round(v) + ' ms';
+            const delayModDepthBKnob = new Knob(document.getElementById('delayModDepthBKnob'), 0, 20, 2, (v) => {
+                synthParams.delayModDepthB = v / 1000;
+                if (delayModGainB) delayModGainB.gain.value = synthParams.delayModDepthB;
+                document.getElementById('delayModDepthBVal').textContent = Math.round(v) + ' ms';
             });
-            document.getElementById('ptModDepthBKnob')._knobInstance = ptModDepthBKnob;
+            document.getElementById('delayModDepthBKnob')._knobInstance = delayModDepthBKnob;
 
-            const ptMixKnob = new Knob(document.getElementById('ptMixKnob'), 0, 100, 0, (v) => {
-                synthParams.ptMix = v / 100;
-                if (delayWetGain) delayWetGain.gain.value = synthParams.ptMix;
-                document.getElementById('ptMixVal').textContent = Math.round(v) + '%';
+            const delayMixKnob = new Knob(document.getElementById('delayMixKnob'), 0, 100, 0, (v) => {
+                synthParams.delayMix = v / 100;
+                if (delayWetGain) delayWetGain.gain.value = synthParams.delayMix;
+                document.getElementById('delayMixVal').textContent = Math.round(v) + '%';
             });
-            document.getElementById('ptMixKnob')._knobInstance = ptMixKnob;
+            document.getElementById('delayMixKnob')._knobInstance = delayMixKnob;
 
-            // SPRING REVERB
-            const springDispersionKnob = new Knob(document.getElementById('springDispersionKnob'), 0, 100, 50, (v) => {
-                synthParams.springDispersion = v / 100;
-                if (audioContext) buildSpringReverb();
-                document.getElementById('springDispersionVal').textContent = Math.round(v) + '%';
+            // REVERB (Freeverb)
+            const reverbRoomSizeKnob = new Knob(document.getElementById('reverbRoomSizeKnob'), 0, 100, 50, (v) => {
+                synthParams.reverbRoomSize = v / 100;
+                if (audioContext) buildFreeverb();
+                document.getElementById('reverbRoomSizeVal').textContent = Math.round(v) + '%';
             });
-            document.getElementById('springDispersionKnob')._knobInstance = springDispersionKnob;
+            document.getElementById('reverbRoomSizeKnob')._knobInstance = reverbRoomSizeKnob;
 
-            const springResonanceKnob = new Knob(document.getElementById('springResonanceKnob'), 400, 2000, 800, (v) => {
-                synthParams.springResonance = v;
-                if (springBandpass) springBandpass.frequency.value = v;
-                document.getElementById('springResonanceVal').textContent = Math.round(v) + ' Hz';
+            const reverbDampingKnob = new Knob(document.getElementById('reverbDampingKnob'), 0, 100, 50, (v) => {
+                synthParams.reverbDamping = v / 100;
+                if (audioContext) buildFreeverb();
+                document.getElementById('reverbDampingVal').textContent = Math.round(v) + '%';
             });
-            document.getElementById('springResonanceKnob')._knobInstance = springResonanceKnob;
+            document.getElementById('reverbDampingKnob')._knobInstance = reverbDampingKnob;
 
-            const springFeedbackKnob = new Knob(document.getElementById('springFeedbackKnob'), 0, 80, 40, (v) => {
-                synthParams.springFeedback = v / 100;
-                if (springFeedbackGain) springFeedbackGain.gain.value = synthParams.springFeedback;
-                document.getElementById('springFeedbackVal').textContent = Math.round(v) + '%';
+            const reverbMixKnob = new Knob(document.getElementById('reverbMixKnob'), 0, 100, 0, (v) => {
+                synthParams.reverbMix = v / 100;
+                if (reverbWetGain) reverbWetGain.gain.value = synthParams.reverbMix;
+                document.getElementById('reverbMixVal').textContent = Math.round(v) + '%';
             });
-            document.getElementById('springFeedbackKnob')._knobInstance = springFeedbackKnob;
-
-            const springMixKnob = new Knob(document.getElementById('springMixKnob'), 0, 100, 0, (v) => {
-                synthParams.springMix = v / 100;
-                if (reverbWetGain) reverbWetGain.gain.value = synthParams.springMix;
-                document.getElementById('springMixVal').textContent = Math.round(v) + '%';
-            });
-            document.getElementById('springMixKnob')._knobInstance = springMixKnob;
-
-            // PCM 70
-            const pcm70SizeKnob = new Knob(document.getElementById('pcm70SizeKnob'), 0, 100, 50, (v) => {
-                synthParams.pcm70Size = v / 100;
-                if (audioContext) buildPCM70();
-                document.getElementById('pcm70SizeVal').textContent = Math.round(v) + '%';
-            });
-            document.getElementById('pcm70SizeKnob')._knobInstance = pcm70SizeKnob;
-
-            const pcm70DecayKnob = new Knob(document.getElementById('pcm70DecayKnob'), 0, 100, 50, (v) => {
-                synthParams.pcm70Decay = v / 100;
-                if (audioContext) buildPCM70();
-                document.getElementById('pcm70DecayVal').textContent = Math.round(v) + '%';
-            });
-            document.getElementById('pcm70DecayKnob')._knobInstance = pcm70DecayKnob;
-
-            const pcm70DiffusionKnob = new Knob(document.getElementById('pcm70DiffusionKnob'), 0, 100, 70, (v) => {
-                synthParams.pcm70Diffusion = v / 100;
-                if (audioContext) buildPCM70();
-                document.getElementById('pcm70DiffusionVal').textContent = Math.round(v) + '%';
-            });
-            document.getElementById('pcm70DiffusionKnob')._knobInstance = pcm70DiffusionKnob;
-
-            const pcm70MixKnob = new Knob(document.getElementById('pcm70MixKnob'), 0, 100, 0, (v) => {
-                synthParams.pcm70Mix = v / 100;
-                if (reverbWetGain) reverbWetGain.gain.value = synthParams.pcm70Mix;
-                document.getElementById('pcm70MixVal').textContent = Math.round(v) + '%';
-            });
-            document.getElementById('pcm70MixKnob')._knobInstance = pcm70MixKnob;
+            document.getElementById('reverbMixKnob')._knobInstance = reverbMixKnob;
         }
 
         function updateSynthParam(id, value) {
@@ -2285,50 +1858,6 @@
             }
         });
 
-        // FX type switching
-        function updateFXDisplay() {
-            // Hide all
-            document.querySelectorAll('.fx-params').forEach(el => el.classList.remove('active'));
-            
-            // Show appropriate delay
-            if (synthParams.delayType === 'space-echo') {
-                document.getElementById('spaceEchoParams').classList.add('active');
-            } else {
-                document.getElementById('primeTimeParams').classList.add('active');
-            }
-            
-            // Show appropriate reverb
-            if (synthParams.reverbType === 'spring') {
-                document.getElementById('springParams').classList.add('active');
-            } else {
-                document.getElementById('pcm70Params').classList.add('active');
-            }
-        }
-
-        document.getElementById('delayType').addEventListener('change', (e) => {
-            synthParams.delayType = e.target.value;
-            updateFXDisplay();
-            if (audioContext) {
-                if (synthParams.delayType === 'space-echo') {
-                    buildSpaceEcho();
-                } else {
-                    buildPrimeTime();
-                }
-            }
-        });
-
-        document.getElementById('reverbType').addEventListener('change', (e) => {
-            synthParams.reverbType = e.target.value;
-            updateFXDisplay();
-            if (audioContext) {
-                if (synthParams.reverbType === 'spring') {
-                    buildSpringReverb();
-                } else {
-                    buildPCM70();
-                }
-            }
-        });
-
         function createPerformanceKnobs() {
             for (let i = 0; i < 5; i++) {
                 const knobInstance = new Knob(
@@ -2370,7 +1899,6 @@
         createSynthControls();
         createFXControls();
         createPerformanceKnobs();
-        updateFXDisplay();
     </script>
 </body>
 </html>
