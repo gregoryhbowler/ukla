@@ -159,6 +159,18 @@
             text-align: center;
         }
 
+        .knob-label.clickable {
+            color: #00d9ff;
+            cursor: pointer;
+            border-bottom: 1px dashed #00d9ff;
+            padding-bottom: 2px;
+        }
+
+        .knob-label.clickable:hover {
+            color: #ffeb3b;
+            border-bottom-color: #ffeb3b;
+        }
+
         .knob {
             width: 60px;
             height: 60px;
@@ -359,6 +371,171 @@
             margin-top: 20px;
         }
 
+        .meta-knob-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .meta-toggle-btn {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #666;
+            padding: 6px 20px;
+            font-size: 0.7em;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .meta-toggle-btn:hover {
+            border-color: #00d9ff;
+            background: #222;
+        }
+
+        .meta-toggle-btn.active {
+            background: #ffeb3b;
+            color: #0a0a0a;
+            border-color: #ffeb3b;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #0f0f0f;
+            border: 1px solid #333;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            color: #00d9ff;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .param-checkbox-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .param-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #1a1a1a;
+            border: 1px solid #222;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .param-checkbox-item:hover {
+            border-color: #00d9ff;
+            background: #222;
+        }
+
+        .param-checkbox-item.selected {
+            border-color: #ffeb3b;
+            background: #222;
+        }
+
+        .param-checkbox-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .param-checkbox {
+            width: 16px;
+            height: 16px;
+            border: 1px solid #666;
+            background: #0a0a0a;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .param-checkbox-item.selected .param-checkbox {
+            border-color: #ffeb3b;
+            background: #ffeb3b;
+        }
+
+        .param-checkbox-item.selected .param-checkbox::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #0a0a0a;
+            font-size: 0.8em;
+        }
+
+        .param-label {
+            color: #e0e0e0;
+            font-size: 0.85em;
+            letter-spacing: 1px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #222;
+        }
+
+        .modal-btn {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #00d9ff;
+            padding: 10px 25px;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .modal-btn:hover {
+            background: #222;
+            border-color: #00d9ff;
+        }
+
+        .modal-btn.primary {
+            background: #00d9ff;
+            color: #0a0a0a;
+        }
+
+        .modal-btn.primary:hover {
+            background: #00b8d4;
+        }
+
         @media (max-width: 768px) {
             .main-controls {
                 gap: 15px;
@@ -523,18 +700,25 @@
             <h3>REVERB</h3>
             <div class="fx-params">
                 <div class="knob-container">
-                    <span class="knob-label">ROOM SIZE</span>
-                    <div class="knob" id="reverbRoomSizeKnob">
+                    <span class="knob-label">DECAY</span>
+                    <div class="knob" id="reverbDecayKnob">
                         <div class="knob-indicator"></div>
                     </div>
-                    <span class="knob-value" id="reverbRoomSizeVal">50%</span>
+                    <span class="knob-value" id="reverbDecayVal">1.5 s</span>
+                </div>
+                <div class="knob-container">
+                    <span class="knob-label">PRE-DELAY</span>
+                    <div class="knob" id="reverbPreDelayKnob">
+                        <div class="knob-indicator"></div>
+                    </div>
+                    <span class="knob-value" id="reverbPreDelayVal">10 ms</span>
                 </div>
                 <div class="knob-container">
                     <span class="knob-label">DAMPING</span>
                     <div class="knob" id="reverbDampingKnob">
                         <div class="knob-indicator"></div>
                     </div>
-                    <span class="knob-value" id="reverbDampingVal">50%</span>
+                    <span class="knob-value" id="reverbDampingVal">8000 Hz</span>
                 </div>
                 <div class="knob-container">
                     <span class="knob-label">MIX</span>
@@ -542,6 +726,19 @@
                         <div class="knob-indicator"></div>
                     </div>
                     <span class="knob-value" id="reverbMixVal">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <h3>MASTER FILTER</h3>
+            <div class="fx-params">
+                <div class="knob-container">
+                    <span class="knob-label">CUTOFF</span>
+                    <div class="knob" id="masterFilterKnob">
+                        <div class="knob-indicator"></div>
+                    </div>
+                    <span class="knob-value" id="masterFilterVal">20000 Hz</span>
                 </div>
             </div>
         </div>
@@ -557,6 +754,13 @@
         <div class="control-group">
             <h3>PERFORMANCE</h3>
             <div class="synth-grid">
+                <div class="knob-container">
+                    <span class="knob-label">MASTER TRANSPOSE</span>
+                    <div class="knob" id="masterTransposeKnob">
+                        <div class="knob-indicator"></div>
+                    </div>
+                    <span class="knob-value" id="masterTransposeVal">0</span>
+                </div>
                 <div class="knob-container">
                     <span class="knob-label">CH-1 TRANSPOSE</span>
                     <div class="knob" id="transpose0Knob">
@@ -592,6 +796,34 @@
                     </div>
                     <span class="knob-value" id="transpose4Val">0</span>
                 </div>
+                <div class="meta-knob-container">
+                    <span class="knob-label clickable" id="meta1Label">ALL-1 (click to assign)</span>
+                    <div class="knob" id="meta1Knob">
+                        <div class="knob-indicator"></div>
+                    </div>
+                    <span class="knob-value" id="meta1Val">0%</span>
+                    <button class="meta-toggle-btn" id="meta1Toggle">LATCH</button>
+                </div>
+                <div class="meta-knob-container">
+                    <span class="knob-label clickable" id="meta2Label">ALL-2 (click to assign)</span>
+                    <div class="knob" id="meta2Knob">
+                        <div class="knob-indicator"></div>
+                    </div>
+                    <span class="knob-value" id="meta2Val">0%</span>
+                    <button class="meta-toggle-btn" id="meta2Toggle">LATCH</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for parameter assignment -->
+    <div class="modal-overlay" id="assignModal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalHeader">ASSIGN PARAMETERS</div>
+            <div class="param-checkbox-list" id="paramList"></div>
+            <div class="modal-footer">
+                <button class="modal-btn" id="modalCancel">CANCEL</button>
+                <button class="modal-btn primary" id="modalConfirm">CONFIRM</button>
             </div>
         </div>
     </div>
@@ -600,6 +832,7 @@
         // Audio Context
         let audioContext;
         let masterGain;
+        let masterFilter;
         let isPlaying = false;
         let currentStep = 0;
         let intervalId;
@@ -615,9 +848,29 @@
         let delayModGainA, delayModGainB;
         let delayMixA, delayMixB;
         
-        // Freeverb nodes
-        let freeverbCombs = [];
-        let freeverbAllpasses = [];
+        // Reverb nodes
+        let reverbConvolver;
+        let reverbPreDelayNode;
+        let reverbDampingFilter;
+        let reverbInput;
+
+        // Meta knob state
+        const metaKnobs = {
+            meta1: {
+                assignments: [],
+                isMomentary: false,
+                baseValues: {},
+                currentKnob: null
+            },
+            meta2: {
+                assignments: [],
+                isMomentary: false,
+                baseValues: {},
+                currentKnob: null
+            }
+        };
+
+        let currentMetaEdit = null;
 
         // Scales
         const scales = {
@@ -655,6 +908,7 @@
             volume: 0.3,
             rootNote: 0,
             tempo: 120,
+            masterTranspose: 0,
             
             // Delay params
             delayTimeA: 0.15,
@@ -667,10 +921,14 @@
             delayModDepthB: 0.002,
             delayMix: 0,
             
-            // Freeverb params
-            reverbRoomSize: 0.5,
-            reverbDamping: 0.5,
-            reverbMix: 0
+            // Reverb params
+            reverbDecay: 1.5,
+            reverbPreDelay: 0.01,
+            reverbDamping: 8000,
+            reverbMix: 0,
+            
+            // Master filter
+            masterFilterCutoff: 20000
         };
 
         // Lane configuration
@@ -736,6 +994,9 @@
 
             onMouseUp() {
                 this.isDragging = false;
+                if (this.onRelease) {
+                    this.onRelease();
+                }
             }
 
             onTouchStart(e) {
@@ -753,6 +1014,9 @@
 
             onTouchEnd() {
                 this.isDragging = false;
+                if (this.onRelease) {
+                    this.onRelease();
+                }
             }
 
             handleDrag(clientY) {
@@ -785,6 +1049,188 @@
                 this.value = value;
                 this.updateVisual();
             }
+        }
+
+        // Meta knob functions
+        function captureBaseValues(metaId) {
+            const meta = metaKnobs[metaId];
+            meta.baseValues = {};
+            
+            meta.assignments.forEach(paramId => {
+                const config = synthControls.find(c => c.id === paramId);
+                if (config) {
+                    if (['oscMix', 'wavefold', 'fmAmount', 'vcaLevel', 'volume'].includes(paramId)) {
+                        meta.baseValues[paramId] = synthParams[paramId] * 100;
+                    } else {
+                        meta.baseValues[paramId] = synthParams[paramId];
+                    }
+                }
+            });
+        }
+
+        function applyMetaKnob(metaId, value) {
+            const meta = metaKnobs[metaId];
+            
+            // value is from -100 to 100 (where 0 is center/12 o'clock)
+            const modulationAmount = value / 100; // -1 to 1
+            
+            meta.assignments.forEach(paramId => {
+                const config = synthControls.find(c => c.id === paramId);
+                if (!config) return;
+                
+                const baseValue = meta.baseValues[paramId];
+                if (baseValue === undefined) return;
+                
+                const range = config.max - config.min;
+                const modulation = range * 0.5 * modulationAmount; // ±50% of range
+                
+                let newValue = baseValue + modulation;
+                newValue = Math.max(config.min, Math.min(config.max, newValue));
+                
+                if (config.step) {
+                    newValue = Math.round(newValue / config.step) * config.step;
+                }
+                
+                // Update the actual parameter
+                updateSynthParam(config.id, newValue);
+                
+                // Update the knob visual
+                const knob = document.getElementById(config.id + 'Knob');
+                const display = document.getElementById(config.id + 'Val');
+                if (knob && knob._knobInstance) {
+                    knob._knobInstance.setValue(newValue);
+                }
+                if (display) {
+                    display.textContent = config.format(newValue);
+                }
+            });
+        }
+
+        function resetMetaKnob(metaId) {
+            const meta = metaKnobs[metaId];
+            
+            meta.assignments.forEach(paramId => {
+                const config = synthControls.find(c => c.id === paramId);
+                if (!config) return;
+                
+                const baseValue = meta.baseValues[paramId];
+                if (baseValue === undefined) return;
+                
+                // Restore base value
+                updateSynthParam(config.id, baseValue);
+                
+                const knob = document.getElementById(config.id + 'Knob');
+                const display = document.getElementById(config.id + 'Val');
+                if (knob && knob._knobInstance) {
+                    knob._knobInstance.setValue(baseValue);
+                }
+                if (display) {
+                    display.textContent = config.format(baseValue);
+                }
+            });
+            
+            // Reset meta knob to center
+            if (meta.currentKnob) {
+                meta.currentKnob.setValue(0);
+            }
+            
+            const display = document.getElementById(metaId + 'Val');
+            if (display) {
+                display.textContent = '0%';
+            }
+        }
+
+        function openAssignmentModal(metaId) {
+            currentMetaEdit = metaId;
+            const modal = document.getElementById('assignModal');
+            const paramList = document.getElementById('paramList');
+            const header = document.getElementById('modalHeader');
+            
+            header.textContent = `ASSIGN PARAMETERS TO ${metaId.toUpperCase()}`;
+            paramList.innerHTML = '';
+            
+            const currentAssignments = metaKnobs[metaId].assignments;
+            
+            synthControls.forEach(config => {
+                if (config.id === 'volume') return; // Don't allow volume assignment
+                
+                const item = document.createElement('div');
+                item.className = 'param-checkbox-item';
+                
+                const isSelected = currentAssignments.includes(config.id);
+                if (isSelected) {
+                    item.classList.add('selected');
+                }
+                
+                // Check if this param is assigned to the OTHER meta knob
+                const otherMetaId = metaId === 'meta1' ? 'meta2' : 'meta1';
+                const isAssignedToOther = metaKnobs[otherMetaId].assignments.includes(config.id);
+                
+                if (isAssignedToOther && !isSelected) {
+                    item.classList.add('disabled');
+                }
+                
+                item.innerHTML = `
+                    <div class="param-checkbox"></div>
+                    <span class="param-label">${config.label}</span>
+                `;
+                
+                if (!isAssignedToOther || isSelected) {
+                    item.addEventListener('click', () => {
+                        const currentCount = paramList.querySelectorAll('.param-checkbox-item.selected').length;
+                        
+                        if (item.classList.contains('selected')) {
+                            item.classList.remove('selected');
+                        } else if (currentCount < 4) {
+                            item.classList.add('selected');
+                        }
+                    });
+                }
+                
+                paramList.appendChild(item);
+            });
+            
+            modal.classList.add('active');
+        }
+
+        function closeAssignmentModal() {
+            document.getElementById('assignModal').classList.remove('active');
+            currentMetaEdit = null;
+        }
+
+        function confirmAssignments() {
+            if (!currentMetaEdit) return;
+            
+            const paramList = document.getElementById('paramList');
+            const selectedItems = paramList.querySelectorAll('.param-checkbox-item.selected');
+            
+            const newAssignments = [];
+            selectedItems.forEach(item => {
+                const label = item.querySelector('.param-label').textContent;
+                const config = synthControls.find(c => c.label === label);
+                if (config) {
+                    newAssignments.push(config.id);
+                }
+            });
+            
+            metaKnobs[currentMetaEdit].assignments = newAssignments;
+            
+            // Update label
+            const labelEl = document.getElementById(currentMetaEdit + 'Label');
+            if (newAssignments.length === 0) {
+                labelEl.textContent = `${currentMetaEdit === 'meta1' ? 'ALL-1' : 'ALL-2'} (click to assign)`;
+            } else {
+                const names = newAssignments.map(id => {
+                    const config = synthControls.find(c => c.id === id);
+                    return config ? config.label : id;
+                }).join(', ');
+                labelEl.textContent = names.length > 30 ? names.substring(0, 27) + '...' : names;
+            }
+            
+            // Capture new base values
+            captureBaseValues(currentMetaEdit);
+            
+            closeAssignmentModal();
         }
 
         // Euclidean algorithm
@@ -833,11 +1279,10 @@
             return [...pattern.slice(rot), ...pattern.slice(0, rot)];
         }
 
-        // DELAY - Dual independent delay lines with modulation
+        // DELAY
         function buildDelay() {
             if (!audioContext) return;
 
-            // Clean up existing
             if (delayA) {
                 [delayA, delayB].forEach(n => { n.disconnect(); });
                 [delayFeedbackA, delayFeedbackB].forEach(n => { n.disconnect(); });
@@ -854,7 +1299,6 @@
                 }
             }
 
-            // Delay Line A
             delayA = audioContext.createDelay(2.0);
             delayA.delayTime.value = synthParams.delayTimeA;
             
@@ -864,7 +1308,6 @@
             delayMixA = audioContext.createGain();
             delayMixA.gain.value = 0.5;
 
-            // LFO A
             delayLFO_A = audioContext.createOscillator();
             delayLFO_A.frequency.value = synthParams.delayModRateA;
             delayModGainA = audioContext.createGain();
@@ -874,13 +1317,11 @@
             delayModGainA.connect(delayA.delayTime);
             delayLFO_A.start();
 
-            // Route A
             delayA.connect(delayFeedbackA);
             delayFeedbackA.connect(delayA);
             delayA.connect(delayMixA);
             delayMixA.connect(delayWetGain);
 
-            // Delay Line B
             delayB = audioContext.createDelay(2.0);
             delayB.delayTime.value = synthParams.delayTimeB;
             
@@ -890,7 +1331,6 @@
             delayMixB = audioContext.createGain();
             delayMixB.gain.value = 0.5;
 
-            // LFO B
             delayLFO_B = audioContext.createOscillator();
             delayLFO_B.frequency.value = synthParams.delayModRateB;
             delayModGainB = audioContext.createGain();
@@ -900,147 +1340,94 @@
             delayModGainB.connect(delayB.delayTime);
             delayLFO_B.start();
 
-            // Route B
             delayB.connect(delayFeedbackB);
             delayFeedbackB.connect(delayB);
             delayB.connect(delayMixB);
             delayMixB.connect(delayWetGain);
         }
 
-        // FREEVERB - Classic Schroeder reverb with filtered-feedback combs + allpass
-        function buildFreeverb() {
-            if (!audioContext) return;
-
-            // Clean up existing
-            freeverbCombs.forEach(comb => {
-                comb.delay.disconnect();
-                comb.filter.disconnect();
-                comb.filterGain.disconnect();
-                comb.directGain.disconnect();
-                comb.feedback.disconnect();
-            });
-            freeverbAllpasses.forEach(ap => {
-                ap.delay.disconnect();
-                ap.feedback.disconnect();
-                ap.feedforward.disconnect();
-            });
-            freeverbCombs = [];
-            freeverbAllpasses = [];
-
-            const roomSize = synthParams.reverbRoomSize;
-            const damping = synthParams.reverbDamping;
-
-            // Freeverb tuning values (in samples at 44.1kHz, scaled to seconds)
+        function generateReverbImpulse(duration, decay, damping) {
             const sampleRate = audioContext.sampleRate;
-            
-            // Comb filter delay times (Freeverb standard tuning values)
-            const combTunings = [
-                1116 / sampleRate,
-                1188 / sampleRate,
-                1277 / sampleRate,
-                1356 / sampleRate,
-                1422 / sampleRate,
-                1491 / sampleRate,
-                1557 / sampleRate,
-                1617 / sampleRate
-            ];
+            const length = sampleRate * duration;
+            const impulse = audioContext.createBuffer(2, length, sampleRate);
+            const leftChannel = impulse.getChannelData(0);
+            const rightChannel = impulse.getChannelData(1);
 
-            // Allpass delay times
-            const allpassTunings = [
-                556 / sampleRate,
-                441 / sampleRate,
-                341 / sampleRate,
-                225 / sampleRate
-            ];
+            const dampingFactor = damping / 16000;
 
-            const combMixer = audioContext.createGain();
-            combMixer.gain.value = 0.125; // 1/8 for 8 combs
+            for (let i = 0; i < length; i++) {
+                const t = i / sampleRate;
+                const envelope = Math.pow(1 - t / duration, decay);
+                
+                const hfDamping = Math.pow(dampingFactor, t / duration);
+                
+                const noise1 = (Math.random() * 2 - 1) * envelope * hfDamping;
+                const noise2 = (Math.random() * 2 - 1) * envelope * hfDamping;
+                
+                leftChannel[i] = noise1;
+                rightChannel[i] = noise2;
+            }
 
-            // Feedback calculation: muted(0.2) at roomSize=0, bright(0.84) at roomSize=1
-            const feedbackGain = 0.2 + (roomSize * 0.64);
-            
-            // Dampening: lower damping = darker sound (more filtering)
-            // Range from 500Hz (dark) to 10000Hz (bright)
-            const filterFreq = 500 + (damping * 9500);
-
-            // Build 8 parallel filtered-feedback comb filters
-            combTunings.forEach(tuning => {
-                const delay = audioContext.createDelay(1.0);
-                delay.delayTime.value = tuning;
-                
-                // Lowpass filter in feedback loop (the "dampening")
-                const filter = audioContext.createBiquadFilter();
-                filter.type = 'lowpass';
-                filter.frequency.value = filterFreq;
-                filter.Q.value = 0.707; // Butterworth response
-                
-                const filterGain = audioContext.createGain();
-                filterGain.gain.value = damping;
-                
-                const directGain = audioContext.createGain();
-                directGain.gain.value = 1 - damping;
-                
-                const feedback = audioContext.createGain();
-                feedback.gain.value = feedbackGain;
-                
-                const inputGain = audioContext.createGain();
-                inputGain.gain.value = 1;
-
-                // Freeverb comb topology: 
-                // input -> delay -> [split: filter*damp + direct*(1-damp)] -> feedback*gain -> delay
-                delay.connect(filter);
-                delay.connect(directGain);
-                
-                filter.connect(filterGain);
-                
-                filterGain.connect(feedback);
-                directGain.connect(feedback);
-                
-                feedback.connect(delay);
-                delay.connect(combMixer);
-
-                freeverbCombs.push({ 
-                    delay, 
-                    filter, 
-                    filterGain, 
-                    directGain, 
-                    feedback,
-                    input: delay // For connecting input
-                });
-            });
-
-            // Build 4 serial allpass filters
-            let apInput = combMixer;
-            allpassTunings.forEach(tuning => {
-                const apDelay = audioContext.createDelay(0.5);
-                apDelay.delayTime.value = tuning;
-                
-                const apFeedback = audioContext.createGain();
-                apFeedback.gain.value = 0.5;
-                
-                const apFeedforward = audioContext.createGain();
-                apFeedforward.gain.value = -0.5;
-                
-                const apMixer = audioContext.createGain();
-                apMixer.gain.value = 1;
-
-                // Freeverb allpass topology
-                apInput.connect(apDelay);
-                apInput.connect(apFeedforward);
-                apDelay.connect(apFeedback);
-                apFeedback.connect(apDelay);
-                apDelay.connect(apMixer);
-                apFeedforward.connect(apMixer);
-
-                freeverbAllpasses.push({ delay: apDelay, feedback: apFeedback, feedforward: apFeedforward });
-                apInput = apMixer;
-            });
-
-            // Final output
-            apInput.connect(reverbWetGain);
+            return impulse;
         }
 
-        // Initialize audio
+        function buildReverb() {
+            if (!audioContext) return;
+
+            if (reverbConvolver) {
+                reverbConvolver.disconnect();
+            }
+            if (reverbPreDelayNode) {
+                reverbPreDelayNode.disconnect();
+            }
+            if (reverbDampingFilter) {
+                reverbDampingFilter.disconnect();
+            }
+            if (reverbInput) {
+                reverbInput.disconnect();
+            }
+
+            reverbInput = audioContext.createGain();
+            reverbInput.gain.value = 1;
+
+            reverbPreDelayNode = audioContext.createDelay(0.2);
+            reverbPreDelayNode.delayTime.value = synthParams.reverbPreDelay;
+
+            reverbDampingFilter = audioContext.createBiquadFilter();
+            reverbDampingFilter.type = 'lowpass';
+            reverbDampingFilter.frequency.value = synthParams.reverbDamping;
+            reverbDampingFilter.Q.value = 0.707;
+
+            reverbConvolver = audioContext.createConvolver();
+            
+            const impulseBuffer = generateReverbImpulse(
+                synthParams.reverbDecay * 2,
+                synthParams.reverbDecay,
+                synthParams.reverbDamping
+            );
+            reverbConvolver.buffer = impulseBuffer;
+
+            reverbInput.connect(reverbPreDelayNode);
+            reverbPreDelayNode.connect(reverbDampingFilter);
+            reverbDampingFilter.connect(reverbConvolver);
+            reverbConvolver.connect(reverbWetGain);
+        }
+
+        function buildMasterFilter() {
+            if (!audioContext) return;
+            
+            if (masterFilter) {
+                masterFilter.disconnect();
+            }
+            
+            masterFilter = audioContext.createBiquadFilter();
+            masterFilter.type = 'lowpass';
+            masterFilter.frequency.value = synthParams.masterFilterCutoff;
+            masterFilter.Q.value = 0.707;
+            
+            masterFilter.connect(masterGain);
+        }
+
         function initAudio() {
             if (!audioContext) {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -1048,35 +1435,30 @@
                 masterGain = audioContext.createGain();
                 masterGain.gain.value = synthParams.volume;
                 
-                // Delay routing
                 delayDryGain = audioContext.createGain();
                 delayWetGain = audioContext.createGain();
                 delayDryGain.gain.value = 1;
                 delayWetGain.gain.value = 0;
 
-                // Reverb routing
                 reverbDryGain = audioContext.createGain();
                 reverbWetGain = audioContext.createGain();
                 reverbDryGain.gain.value = 1;
                 reverbWetGain.gain.value = 0;
 
-                // Build effects
                 buildDelay();
-                buildFreeverb();
+                buildReverb();
+                buildMasterFilter();
 
-                // Connect routing
                 delayWetGain.connect(reverbDryGain);
-                delayWetGain.connect(reverbWetGain);
                 delayDryGain.connect(reverbDryGain);
                 
-                reverbWetGain.connect(masterGain);
-                reverbDryGain.connect(masterGain);
+                reverbWetGain.connect(masterFilter);
+                reverbDryGain.connect(masterFilter);
                 
                 masterGain.connect(audioContext.destination);
             }
         }
 
-        // Wavefolder
         function wavefold(input, amount) {
             const threshold = 1 - amount;
             if (Math.abs(input) > threshold) {
@@ -1087,7 +1469,6 @@
             return input;
         }
 
-        // Buchla oscillator
         function createBuchlaOscillator(frequency, now) {
             const osc1 = audioContext.createOscillator();
             const osc2 = audioContext.createOscillator();
@@ -1104,7 +1485,6 @@
             return { osc1, osc2, osc3 };
         }
 
-        // Play note
         function playNote(frequency, lane) {
             if (!audioContext) return;
             
@@ -1185,7 +1565,6 @@
             lpgFilter.connect(lpgEnvelope);
             lpgEnvelope.connect(vca);
             
-            // Route to effects
             vca.connect(delayDryGain);
             
             if (delayA) {
@@ -1193,8 +1572,8 @@
                 vca.connect(delayB);
             }
             
-            if (freeverbCombs.length > 0) {
-                freeverbCombs.forEach(comb => vca.connect(comb.input));
+            if (reverbInput) {
+                vca.connect(reverbInput);
             }
             
             osc1.start(now);
@@ -1211,7 +1590,6 @@
             fmOsc.stop(stopTime + 0.1);
         }
 
-        // Get frequency from scale
         function getFrequency(scaleIndex, octave, randomness, pulseNoteValue, laneIndex) {
             const scaleSelect = document.getElementById('scaleSelect');
             let currentScale;
@@ -1230,12 +1608,12 @@
                 finalOctave += octaveShift;
             }
             
-            let transposedNoteValue = pulseNoteValue + lanes[laneIndex].transpose;
+            let transposedNoteValue = pulseNoteValue + lanes[laneIndex].transpose + synthParams.masterTranspose;
             
             const scaleLength = currentScale.length;
             transposedNoteValue = ((transposedNoteValue % scaleLength) + scaleLength) % scaleLength;
             
-            const transposeOctaveOffset = Math.floor((pulseNoteValue + lanes[laneIndex].transpose) / scaleLength);
+            const transposeOctaveOffset = Math.floor((pulseNoteValue + lanes[laneIndex].transpose + synthParams.masterTranspose) / scaleLength);
             
             const note = currentScale[transposedNoteValue] + synthParams.rootNote;
             const octaveOffset = Math.floor(pulseNoteValue / currentScale.length) + transposeOctaveOffset;
@@ -1316,12 +1694,15 @@
                     }
                 }
             });
+            
+            // Recapture base values for meta knobs
+            captureBaseValues('meta1');
+            captureBaseValues('meta2');
         }
 
-        // SAVE/LOAD
         function savePreset() {
             const preset = {
-                version: '3.0',
+                version: '3.3',
                 synthParams: { ...synthParams },
                 lanes: lanes.map(lane => ({
                     steps: lane.steps,
@@ -1336,6 +1717,16 @@
                     rootNote: synthParams.rootNote,
                     scaleType: document.getElementById('scaleSelect').value,
                     customScale: document.getElementById('customScale').value
+                },
+                metaKnobs: {
+                    meta1: {
+                        assignments: [...metaKnobs.meta1.assignments],
+                        isMomentary: metaKnobs.meta1.isMomentary
+                    },
+                    meta2: {
+                        assignments: [...metaKnobs.meta2.assignments],
+                        isMomentary: metaKnobs.meta2.isMomentary
+                    }
                 }
             };
 
@@ -1380,7 +1771,6 @@
                     }
                 });
 
-                // Update all FX knobs
                 updateAllFXKnobs();
 
                 document.getElementById('tempoKnob')._knobInstance.setValue(synthParams.tempo);
@@ -1411,7 +1801,45 @@
                     }
                 }
 
+                // Load meta knob assignments
+                if (preset.metaKnobs) {
+                    if (preset.metaKnobs.meta1) {
+                        metaKnobs.meta1.assignments = [...preset.metaKnobs.meta1.assignments];
+                        metaKnobs.meta1.isMomentary = preset.metaKnobs.meta1.isMomentary;
+                        
+                        const toggle1 = document.getElementById('meta1Toggle');
+                        toggle1.textContent = metaKnobs.meta1.isMomentary ? 'MOMENTARY' : 'LATCH';
+                        if (metaKnobs.meta1.isMomentary) {
+                            toggle1.classList.add('active');
+                        }
+                        
+                        updateMetaLabel('meta1');
+                    }
+                    if (preset.metaKnobs.meta2) {
+                        metaKnobs.meta2.assignments = [...preset.metaKnobs.meta2.assignments];
+                        metaKnobs.meta2.isMomentary = preset.metaKnobs.meta2.isMomentary;
+                        
+                        const toggle2 = document.getElementById('meta2Toggle');
+                        toggle2.textContent = metaKnobs.meta2.isMomentary ? 'MOMENTARY' : 'LATCH';
+                        if (metaKnobs.meta2.isMomentary) {
+                            toggle2.classList.add('active');
+                        }
+                        
+                        updateMetaLabel('meta2');
+                    }
+                }
+
                 createSequencerUI();
+
+                const masterTransposeKnob = document.getElementById('masterTransposeKnob');
+                const masterTransposeDisplay = document.getElementById('masterTransposeVal');
+                if (masterTransposeKnob && masterTransposeKnob._knobInstance) {
+                    masterTransposeKnob._knobInstance.setValue(synthParams.masterTranspose);
+                }
+                if (masterTransposeDisplay) {
+                    const val = synthParams.masterTranspose;
+                    masterTransposeDisplay.textContent = val > 0 ? '+' + val : val.toString();
+                }
 
                 for (let i = 0; i < 5; i++) {
                     const knob = document.getElementById(`transpose${i}Knob`);
@@ -1428,8 +1856,15 @@
                 if (audioContext) {
                     masterGain.gain.value = synthParams.volume;
                     buildDelay();
-                    buildFreeverb();
+                    buildReverb();
+                    if (masterFilter) {
+                        masterFilter.frequency.value = synthParams.masterFilterCutoff;
+                    }
                 }
+
+                // Capture base values for meta knobs
+                captureBaseValues('meta1');
+                captureBaseValues('meta2');
 
                 console.log('Preset loaded successfully');
             } catch (error) {
@@ -1438,8 +1873,22 @@
             }
         }
 
+        function updateMetaLabel(metaId) {
+            const labelEl = document.getElementById(metaId + 'Label');
+            const assignments = metaKnobs[metaId].assignments;
+            
+            if (assignments.length === 0) {
+                labelEl.textContent = `${metaId === 'meta1' ? 'ALL-1' : 'ALL-2'} (click to assign)`;
+            } else {
+                const names = assignments.map(id => {
+                    const config = synthControls.find(c => c.id === id);
+                    return config ? config.label : id;
+                }).join(', ');
+                labelEl.textContent = names.length > 30 ? names.substring(0, 27) + '...' : names;
+            }
+        }
+
         function updateAllFXKnobs() {
-            // Delay
             if (document.getElementById('delayTimeAKnob')._knobInstance) {
                 document.getElementById('delayTimeAKnob')._knobInstance.setValue(synthParams.delayTimeA * 1000);
                 document.getElementById('delayTimeAVal').textContent = Math.round(synthParams.delayTimeA * 1000) + ' ms';
@@ -1469,20 +1918,26 @@
                 document.getElementById('delayMixVal').textContent = Math.round(synthParams.delayMix * 100) + '%';
             }
 
-            // Reverb
-            if (document.getElementById('reverbRoomSizeKnob')._knobInstance) {
-                document.getElementById('reverbRoomSizeKnob')._knobInstance.setValue(synthParams.reverbRoomSize * 100);
-                document.getElementById('reverbRoomSizeVal').textContent = Math.round(synthParams.reverbRoomSize * 100) + '%';
+            if (document.getElementById('reverbDecayKnob')._knobInstance) {
+                document.getElementById('reverbDecayKnob')._knobInstance.setValue(synthParams.reverbDecay);
+                document.getElementById('reverbDecayVal').textContent = synthParams.reverbDecay.toFixed(1) + ' s';
                 
-                document.getElementById('reverbDampingKnob')._knobInstance.setValue(synthParams.reverbDamping * 100);
-                document.getElementById('reverbDampingVal').textContent = Math.round(synthParams.reverbDamping * 100) + '%';
+                document.getElementById('reverbPreDelayKnob')._knobInstance.setValue(synthParams.reverbPreDelay * 1000);
+                document.getElementById('reverbPreDelayVal').textContent = Math.round(synthParams.reverbPreDelay * 1000) + ' ms';
+                
+                document.getElementById('reverbDampingKnob')._knobInstance.setValue(synthParams.reverbDamping);
+                document.getElementById('reverbDampingVal').textContent = Math.round(synthParams.reverbDamping) + ' Hz';
                 
                 document.getElementById('reverbMixKnob')._knobInstance.setValue(synthParams.reverbMix * 100);
                 document.getElementById('reverbMixVal').textContent = Math.round(synthParams.reverbMix * 100) + '%';
             }
+
+            if (document.getElementById('masterFilterKnob')._knobInstance) {
+                document.getElementById('masterFilterKnob')._knobInstance.setValue(synthParams.masterFilterCutoff);
+                document.getElementById('masterFilterVal').textContent = Math.round(synthParams.masterFilterCutoff) + ' Hz';
+            }
         }
 
-        // Create sequencer UI
         function createSequencerUI() {
             const sequencer = document.getElementById('sequencer');
             sequencer.innerHTML = '';
@@ -1676,9 +2131,7 @@
             });
         }
 
-        // Create FX controls
         function createFXControls() {
-            // DELAY
             const delayTimeAKnob = new Knob(document.getElementById('delayTimeAKnob'), 50, 1000, 150, (v) => {
                 synthParams.delayTimeA = v / 1000;
                 if (delayA) delayA.delayTime.value = synthParams.delayTimeA;
@@ -1742,33 +2195,26 @@
             });
             document.getElementById('delayMixKnob')._knobInstance = delayMixKnob;
 
-            // REVERB (Freeverb)
-            const reverbRoomSizeKnob = new Knob(document.getElementById('reverbRoomSizeKnob'), 0, 100, 50, (v) => {
-                synthParams.reverbRoomSize = v / 100;
-                if (audioContext && freeverbCombs.length > 0) {
-                    // Update feedback gain for all combs
-                    const feedbackGain = 0.2 + (synthParams.reverbRoomSize * 0.64);
-                    freeverbCombs.forEach(comb => {
-                        comb.feedback.gain.value = feedbackGain;
-                    });
-                }
-                document.getElementById('reverbRoomSizeVal').textContent = Math.round(v) + '%';
-            });
-            document.getElementById('reverbRoomSizeKnob')._knobInstance = reverbRoomSizeKnob;
+            const reverbDecayKnob = new Knob(document.getElementById('reverbDecayKnob'), 0.1, 20, 1.5, (v) => {
+                synthParams.reverbDecay = v;
+                if (audioContext) buildReverb();
+                document.getElementById('reverbDecayVal').textContent = v.toFixed(1) + ' s';
+            }, 0.1);
+            document.getElementById('reverbDecayKnob')._knobInstance = reverbDecayKnob;
 
-            const reverbDampingKnob = new Knob(document.getElementById('reverbDampingKnob'), 0, 100, 50, (v) => {
-                synthParams.reverbDamping = v / 100;
-                if (audioContext && freeverbCombs.length > 0) {
-                    // Update filter frequency and mix for all combs
-                    const filterFreq = 500 + (synthParams.reverbDamping * 9500);
-                    freeverbCombs.forEach(comb => {
-                        comb.filter.frequency.value = filterFreq;
-                        comb.filterGain.gain.value = synthParams.reverbDamping;
-                        comb.directGain.gain.value = 1 - synthParams.reverbDamping;
-                    });
-                }
-                document.getElementById('reverbDampingVal').textContent = Math.round(v) + '%';
+            const reverbPreDelayKnob = new Knob(document.getElementById('reverbPreDelayKnob'), 0, 100, 10, (v) => {
+                synthParams.reverbPreDelay = v / 1000;
+                if (reverbPreDelayNode) reverbPreDelayNode.delayTime.value = synthParams.reverbPreDelay;
+                document.getElementById('reverbPreDelayVal').textContent = Math.round(v) + ' ms';
             });
+            document.getElementById('reverbPreDelayKnob')._knobInstance = reverbPreDelayKnob;
+
+            const reverbDampingKnob = new Knob(document.getElementById('reverbDampingKnob'), 500, 16000, 8000, (v) => {
+                synthParams.reverbDamping = v;
+                if (reverbDampingFilter) reverbDampingFilter.frequency.value = v;
+                if (audioContext) buildReverb();
+                document.getElementById('reverbDampingVal').textContent = Math.round(v) + ' Hz';
+            }, 100);
             document.getElementById('reverbDampingKnob')._knobInstance = reverbDampingKnob;
 
             const reverbMixKnob = new Knob(document.getElementById('reverbMixKnob'), 0, 100, 0, (v) => {
@@ -1777,6 +2223,14 @@
                 document.getElementById('reverbMixVal').textContent = Math.round(v) + '%';
             });
             document.getElementById('reverbMixKnob')._knobInstance = reverbMixKnob;
+
+            // Master filter knob
+            const masterFilterKnob = new Knob(document.getElementById('masterFilterKnob'), 200, 20000, 20000, (v) => {
+                synthParams.masterFilterCutoff = v;
+                if (masterFilter) masterFilter.frequency.value = v;
+                document.getElementById('masterFilterVal').textContent = Math.round(v) + ' Hz';
+            }, 100);
+            document.getElementById('masterFilterKnob')._knobInstance = masterFilterKnob;
         }
 
         function updateSynthParam(id, value) {
@@ -1852,7 +2306,6 @@
         );
         document.getElementById('tempoKnob')._knobInstance = tempoKnob;
 
-        // Start/Stop
         document.getElementById('startBtn').addEventListener('click', () => {
             if (!isPlaying) {
                 initAudio();
@@ -1876,7 +2329,6 @@
             });
         });
 
-        // Save/Load
         document.getElementById('saveBtn').addEventListener('click', savePreset);
         document.getElementById('loadBtn').addEventListener('click', () => {
             document.getElementById('fileInput').click();
@@ -1893,6 +2345,17 @@
         });
 
         function createPerformanceKnobs() {
+            const masterTransposeKnob = new Knob(
+                document.getElementById('masterTransposeKnob'),
+                -12, 12, 0,
+                (value) => {
+                    synthParams.masterTranspose = Math.round(value);
+                    document.getElementById('masterTransposeVal').textContent = 
+                        value > 0 ? '+' + Math.round(value) : Math.round(value).toString();
+                }
+            );
+            document.getElementById('masterTransposeKnob')._knobInstance = masterTransposeKnob;
+
             for (let i = 0; i < 5; i++) {
                 const knobInstance = new Knob(
                     document.getElementById(`transpose${i}Knob`),
@@ -1905,7 +2368,71 @@
                 );
                 document.getElementById(`transpose${i}Knob`)._knobInstance = knobInstance;
             }
+
+            // Meta knob 1
+            const meta1Knob = new Knob(
+                document.getElementById('meta1Knob'),
+                -100, 100, 0,
+                (value) => {
+                    const rounded = Math.round(value);
+                    document.getElementById('meta1Val').textContent = 
+                        (rounded > 0 ? '+' : '') + rounded + '%';
+                    applyMetaKnob('meta1', rounded);
+                }
+            );
+            meta1Knob.onRelease = () => {
+                if (metaKnobs.meta1.isMomentary) {
+                    resetMetaKnob('meta1');
+                }
+            };
+            document.getElementById('meta1Knob')._knobInstance = meta1Knob;
+            metaKnobs.meta1.currentKnob = meta1Knob;
+
+            // Meta knob 2
+            const meta2Knob = new Knob(
+                document.getElementById('meta2Knob'),
+                -100, 100, 0,
+                (value) => {
+                    const rounded = Math.round(value);
+                    document.getElementById('meta2Val').textContent = 
+                        (rounded > 0 ? '+' : '') + rounded + '%';
+                    applyMetaKnob('meta2', rounded);
+                }
+            );
+            meta2Knob.onRelease = () => {
+                if (metaKnobs.meta2.isMomentary) {
+                    resetMetaKnob('meta2');
+                }
+            };
+            document.getElementById('meta2Knob')._knobInstance = meta2Knob;
+            metaKnobs.meta2.currentKnob = meta2Knob;
         }
+
+        // Meta knob assignment labels
+        document.getElementById('meta1Label').addEventListener('click', () => {
+            openAssignmentModal('meta1');
+        });
+
+        document.getElementById('meta2Label').addEventListener('click', () => {
+            openAssignmentModal('meta2');
+        });
+
+        // Meta toggle buttons
+        document.getElementById('meta1Toggle').addEventListener('click', function() {
+            metaKnobs.meta1.isMomentary = !metaKnobs.meta1.isMomentary;
+            this.textContent = metaKnobs.meta1.isMomentary ? 'MOMENTARY' : 'LATCH';
+            this.classList.toggle('active');
+        });
+
+        document.getElementById('meta2Toggle').addEventListener('click', function() {
+            metaKnobs.meta2.isMomentary = !metaKnobs.meta2.isMomentary;
+            this.textContent = metaKnobs.meta2.isMomentary ? 'MOMENTARY' : 'LATCH';
+            this.classList.toggle('active');
+        });
+
+        // Modal controls
+        document.getElementById('modalCancel').addEventListener('click', closeAssignmentModal);
+        document.getElementById('modalConfirm').addEventListener('click', confirmAssignments);
 
         document.getElementById('scaleSelect').addEventListener('change', (e) => {
             const customContainer = document.getElementById('customScaleContainer');
@@ -1933,6 +2460,10 @@
         createSynthControls();
         createFXControls();
         createPerformanceKnobs();
+
+        // Capture initial base values
+        captureBaseValues('meta1');
+        captureBaseValues('meta2');
     </script>
 </body>
 </html>
