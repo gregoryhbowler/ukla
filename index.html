@@ -566,7 +566,7 @@
     <div class="container">
         <header>
             <h1>ukla</h1>
-            <p class="subtitle">west coast algo jams</p>
+            <p class="subtitle">west coast algo jams (optimized)</p>
         </header>
 
         <div class="main-controls">
@@ -829,6 +829,13 @@
     </div>
 
     <script>
+        // ===== PERFORMANCE OPTIMIZATIONS =====
+        // 1. Voice limiting - max concurrent notes
+        // 2. Throttled reverb rebuilding
+        // 3. Optimized DOM updates
+        // 4. Better audio node cleanup
+        // 5. requestAnimationFrame for visual updates
+        
         // Audio Context
         let audioContext;
         let masterGain;
@@ -853,6 +860,14 @@
         let reverbPreDelayNode;
         let reverbDampingFilter;
         let reverbInput;
+
+        // PERFORMANCE: Voice limiting
+        const MAX_VOICES = 16; // Limit concurrent voices
+        let activeVoices = [];
+
+        // PERFORMANCE: Throttle expensive operations
+        let reverbRebuildTimeout = null;
+        let visualUpdateScheduled = false;
 
         // Meta knob state
         const metaKnobs = {
@@ -955,6 +970,19 @@
             { id: 'release', label: 'RELEASE', min: 0.01, max: 3, value: 0.5, step: 0.01, format: (v) => (v * 1000).toFixed(0) + ' ms' },
             { id: 'volume', label: 'VOLUME', min: 0, max: 100, value: 30, format: (v) => v + '%' }
         ];
+
+        // PERFORMANCE: Throttle function
+        function throttle(func, delay) {
+            let timeoutId = null;
+            return function(...args) {
+                if (!timeoutId) {
+                    timeoutId = setTimeout(() => {
+                        func.apply(this, args);
+                        timeoutId = null;
+                    }, delay);
+                }
+            };
+        }
 
         // Knob interaction handler with mobile support
         class Knob {
@@ -1070,9 +1098,7 @@
 
         function applyMetaKnob(metaId, value) {
             const meta = metaKnobs[metaId];
-            
-            // value is from -100 to 100 (where 0 is center/12 o'clock)
-            const modulationAmount = value / 100; // -1 to 1
+            const modulationAmount = value / 100;
             
             meta.assignments.forEach(paramId => {
                 const config = synthControls.find(c => c.id === paramId);
@@ -1082,7 +1108,7 @@
                 if (baseValue === undefined) return;
                 
                 const range = config.max - config.min;
-                const modulation = range * 0.5 * modulationAmount; // ±50% of range
+                const modulation = range * 0.5 * modulationAmount;
                 
                 let newValue = baseValue + modulation;
                 newValue = Math.max(config.min, Math.min(config.max, newValue));
@@ -1091,10 +1117,8 @@
                     newValue = Math.round(newValue / config.step) * config.step;
                 }
                 
-                // Update the actual parameter
                 updateSynthParam(config.id, newValue);
                 
-                // Update the knob visual
                 const knob = document.getElementById(config.id + 'Knob');
                 const display = document.getElementById(config.id + 'Val');
                 if (knob && knob._knobInstance) {
@@ -1116,7 +1140,6 @@
                 const baseValue = meta.baseValues[paramId];
                 if (baseValue === undefined) return;
                 
-                // Restore base value
                 updateSynthParam(config.id, baseValue);
                 
                 const knob = document.getElementById(config.id + 'Knob');
@@ -1129,7 +1152,6 @@
                 }
             });
             
-            // Reset meta knob to center
             if (meta.currentKnob) {
                 meta.currentKnob.setValue(0);
             }
@@ -1152,7 +1174,7 @@
             const currentAssignments = metaKnobs[metaId].assignments;
             
             synthControls.forEach(config => {
-                if (config.id === 'volume') return; // Don't allow volume assignment
+                if (config.id === 'volume') return;
                 
                 const item = document.createElement('div');
                 item.className = 'param-checkbox-item';
@@ -1162,7 +1184,6 @@
                     item.classList.add('selected');
                 }
                 
-                // Check if this param is assigned to the OTHER meta knob
                 const otherMetaId = metaId === 'meta1' ? 'meta2' : 'meta1';
                 const isAssignedToOther = metaKnobs[otherMetaId].assignments.includes(config.id);
                 
@@ -1215,7 +1236,6 @@
             
             metaKnobs[currentMetaEdit].assignments = newAssignments;
             
-            // Update label
             const labelEl = document.getElementById(currentMetaEdit + 'Label');
             if (newAssignments.length === 0) {
                 labelEl.textContent = `${currentMetaEdit === 'meta1' ? 'ALL-1' : 'ALL-2'} (click to assign)`;
@@ -1227,9 +1247,7 @@
                 labelEl.textContent = names.length > 30 ? names.substring(0, 27) + '...' : names;
             }
             
-            // Capture new base values
             captureBaseValues(currentMetaEdit);
-            
             closeAssignmentModal();
         }
 
@@ -1358,9 +1376,7 @@
             for (let i = 0; i < length; i++) {
                 const t = i / sampleRate;
                 const envelope = Math.pow(1 - t / duration, decay);
-                
                 const hfDamping = Math.pow(dampingFactor, t / duration);
-                
                 const noise1 = (Math.random() * 2 - 1) * envelope * hfDamping;
                 const noise2 = (Math.random() * 2 - 1) * envelope * hfDamping;
                 
@@ -1371,7 +1387,8 @@
             return impulse;
         }
 
-        function buildReverb() {
+        // PERFORMANCE: Throttled reverb rebuild
+        const buildReverbThrottled = throttle(function() {
             if (!audioContext) return;
 
             if (reverbConvolver) {
@@ -1411,6 +1428,10 @@
             reverbPreDelayNode.connect(reverbDampingFilter);
             reverbDampingFilter.connect(reverbConvolver);
             reverbConvolver.connect(reverbWetGain);
+        }, 100); // Throttle to max once per 100ms
+
+        function buildReverb() {
+            buildReverbThrottled();
         }
 
         function buildMasterFilter() {
@@ -1485,11 +1506,53 @@
             return { osc1, osc2, osc3 };
         }
 
+        // PERFORMANCE: Voice limiting and better cleanup
+        function cleanupOldVoices() {
+            const now = audioContext.currentTime;
+            activeVoices = activeVoices.filter(voice => {
+                if (voice.stopTime && now > voice.stopTime + 0.1) {
+                    // Voice has finished, disconnect all nodes
+                    try {
+                        voice.nodes.forEach(node => {
+                            if (node && node.disconnect) {
+                                node.disconnect();
+                            }
+                        });
+                    } catch (e) {
+                        // Node may already be disconnected
+                    }
+                    return false; // Remove from active voices
+                }
+                return true; // Keep in active voices
+            });
+        }
+
         function playNote(frequency, lane) {
             if (!audioContext) return;
             
             if (!isFinite(frequency) || frequency < 20 || frequency > 20000) {
                 return;
+            }
+
+            // PERFORMANCE: Limit concurrent voices
+            cleanupOldVoices();
+            if (activeVoices.length >= MAX_VOICES) {
+                // Stop oldest voice
+                const oldestVoice = activeVoices.shift();
+                if (oldestVoice && oldestVoice.nodes) {
+                    oldestVoice.nodes.forEach(node => {
+                        try {
+                            if (node && node.stop) {
+                                node.stop();
+                            }
+                            if (node && node.disconnect) {
+                                node.disconnect();
+                            }
+                        } catch (e) {
+                            // Already stopped/disconnected
+                        }
+                    });
+                }
             }
             
             const now = audioContext.currentTime;
@@ -1588,6 +1651,13 @@
             osc2.stop(stopTime + 0.1);
             osc3.stop(stopTime + 0.1);
             fmOsc.stop(stopTime + 0.1);
+
+            // PERFORMANCE: Track this voice for cleanup
+            activeVoices.push({
+                stopTime: stopTime,
+                nodes: [osc1, osc2, osc3, fmOsc, osc1Gain, osc2Gain, osc3Gain, 
+                        fmGain, waveshaper, lpgFilter, lpgEnvelope, vca]
+            });
         }
 
         function getFrequency(scaleIndex, octave, randomness, pulseNoteValue, laneIndex) {
@@ -1695,7 +1765,6 @@
                 }
             });
             
-            // Recapture base values for meta knobs
             captureBaseValues('meta1');
             captureBaseValues('meta2');
         }
@@ -1801,7 +1870,6 @@
                     }
                 }
 
-                // Load meta knob assignments
                 if (preset.metaKnobs) {
                     if (preset.metaKnobs.meta1) {
                         metaKnobs.meta1.assignments = [...preset.metaKnobs.meta1.assignments];
@@ -1862,7 +1930,6 @@
                     }
                 }
 
-                // Capture base values for meta knobs
                 captureBaseValues('meta1');
                 captureBaseValues('meta2');
 
@@ -2007,7 +2074,7 @@
                         lane.steps = Math.round(value);
                         laneDiv.querySelector('.lane-steps-val').textContent = lane.steps;
                         updatePatterns();
-                        updatePulseDisplay(laneIndex);
+                        scheduleVisualUpdate(laneIndex);
                     }
                 );
                 
@@ -2018,7 +2085,7 @@
                         lane.pulses = Math.round(value);
                         laneDiv.querySelector('.lane-pulses-val').textContent = lane.pulses;
                         updatePatterns();
-                        updatePulseDisplay(laneIndex);
+                        scheduleVisualUpdate(laneIndex);
                     }
                 );
                 
@@ -2029,7 +2096,7 @@
                         lane.rotation = Math.round(value);
                         laneDiv.querySelector('.lane-rotation-val').textContent = lane.rotation;
                         updatePatterns();
-                        updatePulseDisplay(laneIndex);
+                        scheduleVisualUpdate(laneIndex);
                     }
                 );
                 
@@ -2056,45 +2123,101 @@
             lanes.forEach((_, i) => updatePulseDisplay(i));
         }
 
+        // PERFORMANCE: Schedule visual updates using requestAnimationFrame
+        function scheduleVisualUpdate(laneIndex) {
+            if (!visualUpdateScheduled) {
+                visualUpdateScheduled = true;
+                requestAnimationFrame(() => {
+                    updatePulseDisplay(laneIndex);
+                    visualUpdateScheduled = false;
+                });
+            }
+        }
+
+        // PERFORMANCE: Optimized pulse display update (only update what changed)
         function updatePulseDisplay(laneIndex) {
             const lane = lanes[laneIndex];
             const container = document.getElementById(`lane${laneIndex}pulses`);
-            container.innerHTML = '';
             
-            for (let i = 0; i < lane.steps; i++) {
-                const pulseDiv = document.createElement('div');
-                pulseDiv.className = 'pulse-knob-container';
+            // Get existing pulse elements
+            const existingPulses = container.querySelectorAll('.pulse-knob-container');
+            
+            // If number of steps changed, rebuild entirely
+            if (existingPulses.length !== lane.steps) {
+                container.innerHTML = '';
                 
-                const pulseKnob = document.createElement('div');
-                pulseKnob.className = 'pulse-knob';
-                if (lane.pattern[i]) {
-                    pulseKnob.classList.add('active');
-                } else {
-                    pulseKnob.classList.add('inactive');
+                for (let i = 0; i < lane.steps; i++) {
+                    const pulseDiv = document.createElement('div');
+                    pulseDiv.className = 'pulse-knob-container';
+                    
+                    const pulseKnob = document.createElement('div');
+                    pulseKnob.className = 'pulse-knob';
+                    if (lane.pattern[i]) {
+                        pulseKnob.classList.add('active');
+                    } else {
+                        pulseKnob.classList.add('inactive');
+                    }
+                    
+                    const indicator = document.createElement('div');
+                    indicator.className = 'pulse-indicator';
+                    pulseKnob.appendChild(indicator);
+                    
+                    const noteLabel = document.createElement('div');
+                    noteLabel.className = 'pulse-note';
+                    noteLabel.textContent = lane.pattern[i] ? getScaleDegree(lane.noteValues[i]) : '—';
+                    
+                    pulseDiv.appendChild(pulseKnob);
+                    pulseDiv.appendChild(noteLabel);
+                    container.appendChild(pulseDiv);
+                    
+                    if (lane.pattern[i]) {
+                        new Knob(
+                            pulseKnob,
+                            0, 11, lane.noteValues[i],
+                            (value) => {
+                                lane.noteValues[i] = Math.round(value);
+                                noteLabel.textContent = getScaleDegree(lane.noteValues[i]);
+                            }
+                        );
+                    }
                 }
-                
-                const indicator = document.createElement('div');
-                indicator.className = 'pulse-indicator';
-                pulseKnob.appendChild(indicator);
-                
-                const noteLabel = document.createElement('div');
-                noteLabel.className = 'pulse-note';
-                noteLabel.textContent = lane.pattern[i] ? getScaleDegree(lane.noteValues[i]) : '—';
-                
-                pulseDiv.appendChild(pulseKnob);
-                pulseDiv.appendChild(noteLabel);
-                container.appendChild(pulseDiv);
-                
-                if (lane.pattern[i]) {
-                    new Knob(
-                        pulseKnob,
-                        0, 11, lane.noteValues[i],
-                        (value) => {
-                            lane.noteValues[i] = Math.round(value);
-                            noteLabel.textContent = getScaleDegree(lane.noteValues[i]);
+            } else {
+                // Update classes, labels, and ensure knobs exist
+                existingPulses.forEach((pulseDiv, i) => {
+                    const pulseKnob = pulseDiv.querySelector('.pulse-knob');
+                    const noteLabel = pulseDiv.querySelector('.pulse-note');
+                    
+                    if (lane.pattern[i]) {
+                        pulseKnob.classList.add('active');
+                        pulseKnob.classList.remove('inactive');
+                        noteLabel.textContent = getScaleDegree(lane.noteValues[i]);
+                        
+                        // Check if knob instance exists, create if needed
+                        if (!pulseKnob._knobInstance) {
+                            const knobInstance = new Knob(
+                                pulseKnob,
+                                0, 11, lane.noteValues[i],
+                                (value) => {
+                                    lane.noteValues[i] = Math.round(value);
+                                    noteLabel.textContent = getScaleDegree(lane.noteValues[i]);
+                                }
+                            );
+                            pulseKnob._knobInstance = knobInstance;
+                        } else {
+                            // Update existing knob value
+                            pulseKnob._knobInstance.setValue(lane.noteValues[i]);
                         }
-                    );
-                }
+                    } else {
+                        pulseKnob.classList.add('inactive');
+                        pulseKnob.classList.remove('active');
+                        noteLabel.textContent = '—';
+                        
+                        // Remove knob instance if it exists
+                        if (pulseKnob._knobInstance) {
+                            delete pulseKnob._knobInstance;
+                        }
+                    }
+                });
             }
         }
 
@@ -2224,7 +2347,6 @@
             });
             document.getElementById('reverbMixKnob')._knobInstance = reverbMixKnob;
 
-            // Master filter knob
             const masterFilterKnob = new Knob(document.getElementById('masterFilterKnob'), 200, 20000, 20000, (v) => {
                 synthParams.masterFilterCutoff = v;
                 if (masterFilter) masterFilter.frequency.value = v;
@@ -2369,7 +2491,6 @@
                 document.getElementById(`transpose${i}Knob`)._knobInstance = knobInstance;
             }
 
-            // Meta knob 1
             const meta1Knob = new Knob(
                 document.getElementById('meta1Knob'),
                 -100, 100, 0,
@@ -2388,7 +2509,6 @@
             document.getElementById('meta1Knob')._knobInstance = meta1Knob;
             metaKnobs.meta1.currentKnob = meta1Knob;
 
-            // Meta knob 2
             const meta2Knob = new Knob(
                 document.getElementById('meta2Knob'),
                 -100, 100, 0,
@@ -2408,7 +2528,6 @@
             metaKnobs.meta2.currentKnob = meta2Knob;
         }
 
-        // Meta knob assignment labels
         document.getElementById('meta1Label').addEventListener('click', () => {
             openAssignmentModal('meta1');
         });
@@ -2417,7 +2536,6 @@
             openAssignmentModal('meta2');
         });
 
-        // Meta toggle buttons
         document.getElementById('meta1Toggle').addEventListener('click', function() {
             metaKnobs.meta1.isMomentary = !metaKnobs.meta1.isMomentary;
             this.textContent = metaKnobs.meta1.isMomentary ? 'MOMENTARY' : 'LATCH';
@@ -2430,7 +2548,6 @@
             this.classList.toggle('active');
         });
 
-        // Modal controls
         document.getElementById('modalCancel').addEventListener('click', closeAssignmentModal);
         document.getElementById('modalConfirm').addEventListener('click', confirmAssignments);
 
@@ -2441,16 +2558,16 @@
             } else {
                 customContainer.style.display = 'none';
             }
-            lanes.forEach((_, i) => updatePulseDisplay(i));
+            lanes.forEach((_, i) => scheduleVisualUpdate(i));
         });
 
         document.getElementById('rootNote').addEventListener('change', (e) => {
             synthParams.rootNote = parseInt(e.target.value);
-            lanes.forEach((_, i) => updatePulseDisplay(i));
+            lanes.forEach((_, i) => scheduleVisualUpdate(i));
         });
 
         document.getElementById('customScale').addEventListener('input', () => {
-            lanes.forEach((_, i) => updatePulseDisplay(i));
+            lanes.forEach((_, i) => scheduleVisualUpdate(i));
         });
 
         document.getElementById('randomizePatch').addEventListener('click', randomizePatch);
@@ -2461,7 +2578,6 @@
         createFXControls();
         createPerformanceKnobs();
 
-        // Capture initial base values
         captureBaseValues('meta1');
         captureBaseValues('meta2');
     </script>
